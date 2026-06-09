@@ -5,6 +5,7 @@ CREATE TABLE customers (
     full_name     VARCHAR(100) NOT NULL,
     phone         VARCHAR(15)  UNIQUE NOT NULL,
     email         VARCHAR(100) UNIQUE,
+    password      VARCHAR(255) NOT NULL,
     tier          VARCHAR(20)  NOT NULL DEFAULT 'MEMBER',
     total_points  INT          NOT NULL DEFAULT 0,
     lifetime_points INT        NOT NULL DEFAULT 0,

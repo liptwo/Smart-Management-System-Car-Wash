@@ -17,7 +17,18 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+management:
+  health:
+    redis:
+      enabled: false
 logging:
   level:
     com.autowash: DEBUG
