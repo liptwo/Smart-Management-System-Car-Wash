@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/autowash_db
+    username: postgres
+    password: autowash123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    com.autowash: DEBUG
+    org.flywaydb: INFO
