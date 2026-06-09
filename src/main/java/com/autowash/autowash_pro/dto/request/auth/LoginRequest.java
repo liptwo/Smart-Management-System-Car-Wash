@@ -1,5 +1,4 @@
-package com.autowash.autowash_pro.dto.request;
-
+package com.autowash.autowash_pro.dto.request.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
