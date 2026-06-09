@@ -49,6 +49,9 @@ public class Customer {
     @Column(unique = true, length = 100)
     private String email;
 
+    @Column(nullable = false)
+    private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default

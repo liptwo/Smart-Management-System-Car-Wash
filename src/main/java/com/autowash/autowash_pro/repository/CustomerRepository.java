@@ -16,6 +16,7 @@ public interface CustomerRepository
 
     Optional<Customer> findByPhone(String phone);
     Optional<Customer> findByEmail(String email);
+    
     boolean existsByPhone(String phone);
     boolean existsByEmail(String email);
     List<Customer> findByTier(Tier tier);

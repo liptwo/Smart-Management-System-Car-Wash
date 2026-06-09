@@ -1,0 +1,115 @@
+package com.autowash.autowash_pro.service;
+
+import com.autowash.autowash_pro.config.JwtUtil;
+import com.autowash.autowash_pro.config.JwtProperties;
+import com.autowash.autowash_pro.dto.request.AuthResponse;
+import com.autowash.autowash_pro.dto.request.LoginRequest;
+import com.autowash.autowash_pro.dto.request.MessageResponse;
+import com.autowash.autowash_pro.dto.request.RefreshTokenRequest;
+// import com.autowash.autowash_pro.dto.request.VerifyOtpRequest;
+import com.autowash.autowash_pro.entity.Customer;
+import com.autowash.autowash_pro.exception.ResourceNotFoundException;
+import com.autowash.autowash_pro.repository.CustomerRepository;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.autowash.autowash_pro.dto.request.RegisterRequest;
+import com.autowash.autowash_pro.exception.BusinessException;
+
+@Service
+@RequiredArgsConstructor
+public class AuthService {
+
+    private final CustomerRepository customerRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+
+    @Transactional
+    public AuthResponse register(RegisterRequest request) {
+
+        // Kiểm tra phone đã tồn tại chưa
+        if (customerRepository.existsByPhone(request.getPhone())) {
+            throw new BusinessException(
+                "Số điện thoại đã được đăng ký");
+        }
+
+        // Kiểm tra email nếu có
+        if (request.getEmail() != null
+                && customerRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException("Email đã được sử dụng");
+        }
+
+        // Tạo customer mới
+        Customer customer = Customer.builder()
+            .fullName(request.getFullName())
+            .phone(request.getPhone())
+            .email(request.getEmail())
+            .password(passwordEncoder.encode(request.getPassword()))
+            .build();
+
+        customerRepository.save(customer);
+
+        // Tạo token ngay sau đăng ký
+        return buildAuthResponse(customer);
+    }
+
+    public AuthResponse login(LoginRequest request) {
+
+        Customer customer = customerRepository
+            .findByPhone(request.getPhone())
+            .orElseThrow(() ->
+                new BusinessException("Số điện thoại hoặc mật khẩu không đúng"));
+
+        if (!customer.isActive()) {
+            throw new BusinessException("Tài khoản đã bị khóa");
+        }
+
+        if (!passwordEncoder.matches(
+                request.getPassword(), customer.getPassword())) {
+            throw new BusinessException(
+                "Số điện thoại hoặc mật khẩu không đúng");
+        }
+
+        return buildAuthResponse(customer);
+    }
+
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+
+        if (!jwtUtil.isTokenValid(request.getRefreshToken())) {
+            throw new BusinessException("Refresh token không hợp lệ");
+        }
+
+        String phone = jwtUtil.extractPhone(request.getRefreshToken());
+        Customer customer = customerRepository
+            .findByPhone(phone)
+            .orElseThrow(() ->
+                new ResourceNotFoundException("Không tìm thấy user"));
+
+        return buildAuthResponse(customer);
+    }
+
+    // Helper dùng chung
+    private AuthResponse buildAuthResponse(Customer customer) {
+        String role = customer.isAdmin() ? "ADMIN" : "CUSTOMER";
+        return AuthResponse.builder()
+            .accessToken(jwtUtil.generateAccessToken(
+                customer.getPhone(), role))
+            .refreshToken(jwtUtil.generateRefreshToken(
+                customer.getPhone()))
+            .tokenType("Bearer")
+            .role(role)
+            .tier(customer.getTier())
+            .fullName(customer.getFullName())
+            .phone(customer.getPhone())
+            .build();
+    }
+}
