@@ -40,7 +40,10 @@ public class SecurityConfig {
                     "/actuator/health",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
-                    "/v3/api-docs/**"
+                    "/v3/api-docs/**",
+                    
+                    // 🛠️ ĐÃ THÊM ĐƯỜNG DẪN NÀY ĐỂ BỎ QUA TOKEN KHI ADMIN QUẢN LÝ KHÁCH HÀNG TẠI QUẦY:
+                    "/api/admin/customers/**"
                 ).permitAll()
                 .requestMatchers("/api/admin/**")
                     .hasRole("ADMIN")
