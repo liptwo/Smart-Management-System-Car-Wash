@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
+import com.autowash.autowash_pro.entity.Vehicle;
 
 @RestController
 @RequestMapping("/api/admin/customers")
@@ -51,5 +52,11 @@ public class CustomerController {
     public ResponseEntity<String> disableCustomer(@PathVariable UUID id) {
         customerService.disableCustomer(id);
         return ResponseEntity.ok("Đã vô hiệu hóa khách hàng thành công!");
+    }
+
+    // Endpoint: GET http://localhost:8080/api/admin/customers/{id}/vehicles
+    @GetMapping("/{id}/vehicles")
+    public ResponseEntity<List<Vehicle>> getVehiclesByCustomerId(@PathVariable UUID id) {
+        return ResponseEntity.ok(customerService.getVehiclesByCustomerId(id));
     }
 }

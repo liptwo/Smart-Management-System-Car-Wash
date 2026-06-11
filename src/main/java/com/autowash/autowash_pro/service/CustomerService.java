@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
+import com.autowash.autowash_pro.entity.Vehicle;
+import com.autowash.autowash_pro.repository.VehicleRepository;
 
 @Service
 public class CustomerService {
