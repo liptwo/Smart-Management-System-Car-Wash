@@ -45,6 +45,9 @@ public class CustomerService {
         return customerRepository.save(customer);
     }
 
+    @Autowired
+    private VehicleRepository vehicleRepository;
+
     // 1. Logic lấy chi tiết 1 khách hàng theo ID
     public Customer getCustomerById(UUID id) {
         return customerRepository.findById(id)
@@ -71,4 +74,7 @@ public class CustomerService {
         customer.setActive(false);
         customerRepository.save(customer);
     }
+    public List<Vehicle> getVehiclesByCustomerId(UUID customerId) {
+       return vehicleRepository.findByCustomerCustomerId(customerId);
+   }
 }
