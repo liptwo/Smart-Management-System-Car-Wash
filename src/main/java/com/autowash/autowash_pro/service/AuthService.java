@@ -19,9 +19,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;

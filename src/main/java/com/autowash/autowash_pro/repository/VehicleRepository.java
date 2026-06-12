@@ -7,7 +7,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface VehicleRepository extends JpaRepository<Vehicle, UUID> {
-    // Tìm danh sách xe dựa vào customerId của khách hàng liên kết
-    List<Vehicle> findByCustomerCustomerId(UUID customerId);
+public interface VehicleRepository
+        extends JpaRepository<Vehicle, UUID> {
+
+    List<Vehicle> findByCustomer_CustomerId(UUID customerId);
+    Optional<Vehicle> findByLicensePlate(String licensePlate);
+    Optional<Vehicle> findByVehicleIdAndCustomer_CustomerId(
+        UUID vehicleId, UUID customerId);
+    boolean existsByLicensePlate(String licensePlate);
+    Optional<Vehicle> findByCustomer_CustomerIdAndIsPrimaryTrue(UUID customerId);
 }
