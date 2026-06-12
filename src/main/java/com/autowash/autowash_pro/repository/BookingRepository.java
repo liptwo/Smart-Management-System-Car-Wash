@@ -36,4 +36,5 @@ public interface BookingRepository
 
     int countByScheduledAtAndStatusIn(
         LocalDateTime scheduledAt, List<BookingStatus> statuses);
+    boolean existsByVehicle_VehicleId(UUID vehicleId);
 }

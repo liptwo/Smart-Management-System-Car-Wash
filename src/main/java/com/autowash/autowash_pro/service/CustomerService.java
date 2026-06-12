@@ -45,7 +45,7 @@ public class CustomerService {
                 .isActive(true)
                 .isAdmin(false)
                 .build();
-        
+
         return customerRepository.save(customer);
     }
 
@@ -65,11 +65,12 @@ public class CustomerService {
     @Transactional
     public Customer updateCustomer(UUID id, CustomerRequestDTO dto) {
         Customer customer = getCustomerById(id);
-        
+
         customer.setFullName(dto.getName());
         customer.setPhone(dto.getPhone());
         customer.setEmail(dto.getEmail());
-        // Bạn có thể bổ sung thêm customer.setTier(...) nếu muốn cho Admin đổi hạng thẻ tại đây
+        // Bạn có thể bổ sung thêm customer.setTier(...) nếu muốn cho Admin đổi hạng thẻ
+        // tại đây
 
         return customerRepository.save(customer);
     }
@@ -81,11 +82,12 @@ public class CustomerService {
         customer.setActive(false);
         customerRepository.save(customer);
     }
-    public List<Vehicle> getVehiclesByCustomerId(UUID customerId) {
-       return vehicleRepository.findByCustomerCustomerId(customerId);
-   }
 
-   // Gọi hàm có sẵn của nhóm để lôi lịch sử đặt lịch rửa xe
+    public List<Vehicle> getVehiclesByCustomerId(UUID customerId) {
+        return vehicleRepository.findByCustomer_CustomerId(customerId);
+    }
+
+    // Gọi hàm có sẵn của nhóm để lôi lịch sử đặt lịch rửa xe
     public List<Booking> getBookingHistoryByCustomerId(UUID customerId) {
         return bookingRepository.findByCustomer_CustomerId(customerId);
     }

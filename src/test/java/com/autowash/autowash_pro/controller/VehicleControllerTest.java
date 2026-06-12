@@ -45,7 +45,7 @@ class VehicleControllerTest {
 
         ResponseEntity<List<VehicleResponse>> result = vehicleController.getMyVehicles(authentication);
 
-        assertEquals(200, result.getStatusCodeValue());
+        assertEquals(200, result.getStatusCode().value());
         assertEquals(1, result.getBody().size());
     }
 
@@ -64,7 +64,7 @@ class VehicleControllerTest {
 
         ResponseEntity<VehicleResponse> result = vehicleController.createVehicle(authentication, req);
 
-        assertEquals(201, result.getStatusCodeValue());
+        assertEquals(201, result.getStatusCode().value());
         assertEquals("ABC123", result.getBody().getLicensePlate());
     }
 
@@ -76,6 +76,6 @@ class VehicleControllerTest {
 
         ResponseEntity<Void> result = vehicleController.deleteVehicle(authentication, vehicleId);
 
-        assertEquals(204, result.getStatusCodeValue());
+        assertEquals(204, result.getStatusCode().value());
     }
 }
