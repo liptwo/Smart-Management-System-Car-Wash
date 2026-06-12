@@ -6,6 +6,8 @@ import com.autowash.autowash_pro.dto.request.auth.AuthResponse;
 import com.autowash.autowash_pro.dto.request.auth.LoginRequest;
 import com.autowash.autowash_pro.dto.request.auth.MessageResponse;
 import com.autowash.autowash_pro.dto.request.auth.RefreshTokenRequest;
+import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;
+
 // import com.autowash.autowash_pro.dto.request.VerifyOtpRequest;
 import com.autowash.autowash_pro.entity.Customer;
 import com.autowash.autowash_pro.exception.ResourceNotFoundException;

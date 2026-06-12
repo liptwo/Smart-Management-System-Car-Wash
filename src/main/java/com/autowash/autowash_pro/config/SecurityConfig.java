@@ -30,30 +30,34 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/**",
-                                "/actuator/health",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**")
-                        .permitAll()
-                        .requestMatchers("/api/admin/**")
-                        .hasRole("ADMIN")
-                        .requestMatchers(
-                                "/api/customers/**",
-                                "/api/bookings/**",
-                                "/api/loyalty/**",
-                                "/api/vehicles/**")
-                        .hasAnyRole("CUSTOMER", "ADMIN")
-                        .anyRequest().authenticated())
-                .userDetailsService(userDetailsService)
-                .addFilterBefore(jwtAuthFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/api/auth/**",
+                    "/actuator/health",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**",
+                    
+                    // 🛠️ ĐÃ THÊM ĐƯỜNG DẪN NÀY ĐỂ BỎ QUA TOKEN KHI ADMIN QUẢN LÝ KHÁCH HÀNG TẠI QUẦY:
+                    "/api/admin/customers/**"
+                ).permitAll()
+                .requestMatchers("/api/admin/**")
+                    .hasRole("ADMIN")
+                .requestMatchers(
+                    "/api/customers/**",
+                    "/api/bookings/**",
+                    "/api/loyalty/**",
+                    "/api/vehicles/**"
+                ).hasAnyRole("CUSTOMER", "ADMIN")
+                .anyRequest().authenticated()
+            )
+            .userDetailsService(userDetailsService)
+            .addFilterBefore(jwtAuthFilter,
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

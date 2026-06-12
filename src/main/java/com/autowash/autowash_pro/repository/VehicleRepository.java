@@ -1,20 +1,13 @@
 package com.autowash.autowash_pro.repository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
+import com.autowash.autowash_pro.entity.Vehicle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import com.autowash.autowash_pro.entity.Vehicle;
+import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface VehicleRepository
-        extends JpaRepository<Vehicle, UUID> {
-
-    List<Vehicle> findByCustomer_CustomerId(UUID customerId);
-    Optional<Vehicle> findByLicensePlate(String licensePlate);
-    boolean existsByLicensePlate(String licensePlate);
-    Optional<Vehicle> findByCustomer_CustomerIdAndIsPrimaryTrue(UUID customerId);
+public interface VehicleRepository extends JpaRepository<Vehicle, UUID> {
+    // Tìm danh sách xe dựa vào customerId của khách hàng liên kết
+    List<Vehicle> findByCustomerCustomerId(UUID customerId);
 }
