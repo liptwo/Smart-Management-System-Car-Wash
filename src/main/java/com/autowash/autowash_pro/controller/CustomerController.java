@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 import com.autowash.autowash_pro.entity.Vehicle;
+import com.autowash.autowash_pro.entity.Booking;
 
 @RestController
 @RequestMapping("/api/admin/customers")
@@ -58,5 +59,11 @@ public class CustomerController {
     @GetMapping("/{id}/vehicles")
     public ResponseEntity<List<Vehicle>> getVehiclesByCustomerId(@PathVariable UUID id) {
         return ResponseEntity.ok(customerService.getVehiclesByCustomerId(id));
+    }
+
+    // Endpoint: GET http://localhost:8080/api/admin/customers/{id}/history
+    @GetMapping("/{id}/history")
+    public ResponseEntity<List<Booking>> getBookingHistoryByCustomerId(@PathVariable UUID id) {
+        return ResponseEntity.ok(customerService.getBookingHistoryByCustomerId(id));
     }
 }

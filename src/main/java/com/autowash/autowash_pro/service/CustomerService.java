@@ -12,6 +12,8 @@ import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 import com.autowash.autowash_pro.entity.Vehicle;
 import com.autowash.autowash_pro.repository.VehicleRepository;
+import com.autowash.autowash_pro.entity.Booking;
+import com.autowash.autowash_pro.repository.BookingRepository;
 
 @Service
 public class CustomerService {
@@ -48,6 +50,9 @@ public class CustomerService {
     }
 
     @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
     private VehicleRepository vehicleRepository;
 
     // 1. Logic lấy chi tiết 1 khách hàng theo ID
@@ -79,4 +84,9 @@ public class CustomerService {
     public List<Vehicle> getVehiclesByCustomerId(UUID customerId) {
        return vehicleRepository.findByCustomerCustomerId(customerId);
    }
+
+   // Gọi hàm có sẵn của nhóm để lôi lịch sử đặt lịch rửa xe
+    public List<Booking> getBookingHistoryByCustomerId(UUID customerId) {
+        return bookingRepository.findByCustomer_CustomerId(customerId);
+    }
 }
