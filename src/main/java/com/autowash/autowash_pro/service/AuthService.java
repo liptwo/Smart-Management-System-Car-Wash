@@ -2,14 +2,13 @@ package com.autowash.autowash_pro.service;
 
 import com.autowash.autowash_pro.config.JwtUtil;
 import com.autowash.autowash_pro.config.JwtProperties;
-
-// Đã cập nhật chính xác đường dẫn vào nhóm thư mục con .auth
 import com.autowash.autowash_pro.dto.request.auth.AuthResponse;
 import com.autowash.autowash_pro.dto.request.auth.LoginRequest;
 import com.autowash.autowash_pro.dto.request.auth.MessageResponse;
 import com.autowash.autowash_pro.dto.request.auth.RefreshTokenRequest;
 import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;
 
+// import com.autowash.autowash_pro.dto.request.VerifyOtpRequest;
 import com.autowash.autowash_pro.entity.Customer;
 import com.autowash.autowash_pro.exception.ResourceNotFoundException;
 import com.autowash.autowash_pro.repository.CustomerRepository;
@@ -24,6 +23,8 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;
 import com.autowash.autowash_pro.exception.BusinessException;
 
 @Service

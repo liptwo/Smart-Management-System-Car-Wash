@@ -1,0 +1,18 @@
+package com.autowash.autowash_pro.dto.response;
+
+import java.util.UUID;
+
+import com.autowash.autowash_pro.enums.RedeemType;
+
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
+public class RedeemPointsResponse {
+    private UUID customerId;
+    private RedeemType redeemType;
+    private int pointsUsed;
+    private int remainingBalance;
+    private String message;
+}

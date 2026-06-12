@@ -7,10 +7,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// Đã sửa đường dẫn import chính xác trỏ vào package con .auth
 import com.autowash.autowash_pro.dto.request.auth.AuthResponse;
 import com.autowash.autowash_pro.dto.request.auth.LoginRequest;
 import com.autowash.autowash_pro.dto.request.auth.RefreshTokenRequest;
+import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;
+import com.autowash.autowash_pro.dto.request.auth.AuthResponse;
 import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;
 import com.autowash.autowash_pro.service.AuthService;
 

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>4.1.0</version>
         <relativePath/>
     </parent>
     <groupId>com.autowash</groupId>
@@ -113,6 +113,21 @@
             <artifactId>resend-java</artifactId>
             <version>3.1.0</version>
         </dependency>
+
+        <!-- WebClient cho Supabase Storage -->
+        <!-- <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency> -->
+
+
+        <!-- servlet
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency> -->
     </dependencies>
 
     <build>
