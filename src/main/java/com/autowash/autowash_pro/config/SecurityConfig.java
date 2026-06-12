@@ -30,31 +30,30 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/auth/**",
-                    "/actuator/health",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html",
-                    "/v3/api-docs/**"
-                ).permitAll()
-                .requestMatchers("/api/admin/**")
-                    .hasRole("ADMIN")
-                .requestMatchers(
-                    "/api/customers/**",
-                    "/api/bookings/**",
-                    "/api/loyalty/**",
-                    "/api/vehicles/**"
-                ).hasAnyRole("CUSTOMER", "ADMIN")
-                .anyRequest().authenticated()
-            )
-            .userDetailsService(userDetailsService)
-            .addFilterBefore(jwtAuthFilter,
-                UsernamePasswordAuthenticationFilter.class);
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/actuator/health",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**")
+                        .permitAll()
+                        .requestMatchers("/api/admin/**")
+                        .hasRole("ADMIN")
+                        .requestMatchers(
+                                "/api/customers/**",
+                                "/api/bookings/**",
+                                "/api/loyalty/**",
+                                "/api/vehicles/**")
+                        .hasAnyRole("CUSTOMER", "ADMIN")
+                        .anyRequest().authenticated())
+                .userDetailsService(userDetailsService)
+                .addFilterBefore(jwtAuthFilter,
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -65,18 +64,16 @@ public class SecurityConfig {
 
         // Đổi setAllowedOrigins → setAllowedOriginPatterns
         config.setAllowedOriginPatterns(List.of(
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://localhost:*"
-        ));
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://localhost:*",
+                "*"));
         config.setAllowedMethods(List.of(
-            "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
-        ));
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", config);
         return source;
     }
