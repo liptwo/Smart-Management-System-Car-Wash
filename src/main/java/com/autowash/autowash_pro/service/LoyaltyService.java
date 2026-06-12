@@ -1,20 +1,20 @@
-package com.autowash.autowashpro.service;
+package com.autowash.autowash_pro.service;
 
-import com.autowash.autowashpro.dto.request.EarnPointsRequest;
-import com.autowash.autowashpro.dto.request.RedeemPointsRequest;
-import com.autowash.autowashpro.dto.request.UpdateTierConfigRequest;
-import com.autowash.autowashpro.dto.response.*;
-import com.autowash.autowashpro.entity.Customer;
-import com.autowash.autowashpro.entity.CustomerPoints;
-import com.autowash.autowashpro.entity.LoyaltyTierConfig;
-import com.autowash.autowashpro.enums.PointType;
-import com.autowash.autowashpro.enums.RedeemType;
-import com.autowash.autowashpro.enums.Tier;
-import com.autowash.autowashpro.exception.BusinessException;
-import com.autowash.autowashpro.exception.ResourceNotFoundException;
-import com.autowash.autowashpro.repository.CustomerPointsRepository;
-import com.autowash.autowashpro.repository.CustomerRepository;
-import com.autowash.autowashpro.repository.LoyaltyTierConfigRepository;
+import com.autowash.autowash_pro.dto.request.EarnPointsRequest;
+import com.autowash.autowash_pro.dto.request.RedeemPointsRequest;
+import com.autowash.autowash_pro.dto.request.UpdateTierConfigRequest;
+import com.autowash.autowash_pro.dto.response.*;
+import com.autowash.autowash_pro.entity.Customer;
+import com.autowash.autowash_pro.entity.CustomerPoints;
+import com.autowash.autowash_pro.entity.LoyaltyTierConfig;
+import com.autowash.autowash_pro.enums.PointType;
+import com.autowash.autowash_pro.enums.RedeemType;
+import com.autowash.autowash_pro.enums.Tier;
+import com.autowash.autowash_pro.exception.BusinessException;
+import com.autowash.autowash_pro.exception.ResourceNotFoundException;
+import com.autowash.autowash_pro.repository.CustomerPointsRepository;
+import com.autowash.autowash_pro.repository.CustomerRepository;
+import com.autowash.autowash_pro.repository.LoyaltyTierConfigRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -55,7 +55,12 @@ public class LoyaltyService {
     // PUT /api/admin/tier-config
     // =========================================================================
 
-    public TierConfigResponse updateTierConfig(UpdateTierConfigRequest request, UUID adminId) {
+    public TierConfigResponse updateTierConfig(UpdateTierConfigRequest request, String adminPhone) {
+        Customer admin = findCustomerByPhone(adminPhone);
+        if (!admin.isAdmin()) {
+            throw new BusinessException("Chỉ admin mới có quyền cập nhật cấu hình điểm thưởng");
+        }
+
         // Deactivate config hiện tại (audit trail — giữ lại lịch sử)
         loyaltyTierConfigRepository.findByActiveTrue().ifPresent(old -> {
             old.setActive(false);
@@ -75,11 +80,11 @@ public class LoyaltyService {
             .redeemPointsFreePremium(request.getRedeemPointsFreePremium())
             .redeemPointsAddon(request.getRedeemPointsAddon())
             .active(true)
-            .updatedBy(adminId)
+            .updatedBy(admin.getCustomerId())
             .build();
 
         loyaltyTierConfigRepository.save(newConfig);
-        log.info("[Admin {}] Đã cập nhật tier config: {} VND/point", adminId, request.getVndPerPoint());
+        log.info("[Admin {}] Đã cập nhật tier config: {} VND/point", admin.getCustomerId(), request.getVndPerPoint());
 
         return mapToTierConfigResponse(newConfig);
     }
@@ -152,7 +157,9 @@ public class LoyaltyService {
     // POST /api/loyalty/redeem
     // =========================================================================
 
-    public RedeemPointsResponse redeemPoints(RedeemPointsRequest request) {
+    public RedeemPointsResponse redeemPoints(RedeemPointsRequest request,
+                                               String currentUserPhone) {
+        validateCustomerAccess(request.getCustomerId(), currentUserPhone);
         Customer customer = findCustomerById(request.getCustomerId());
         LoyaltyTierConfig config = findActiveConfig();
 
@@ -200,7 +207,8 @@ public class LoyaltyService {
     // =========================================================================
 
     @Transactional(readOnly = true)
-    public PointBalanceResponse getBalance(UUID customerId) {
+    public PointBalanceResponse getBalance(UUID customerId, String currentUserPhone) {
+        validateCustomerAccess(customerId, currentUserPhone);
         Customer customer = findCustomerById(customerId);
 
         // Điểm sắp hết hạn trong 30 ngày tới
@@ -229,7 +237,10 @@ public class LoyaltyService {
     // =========================================================================
 
     @Transactional(readOnly = true)
-    public Page<PointHistoryResponse> getPointHistory(UUID customerId, Pageable pageable) {
+    public Page<PointHistoryResponse> getPointHistory(UUID customerId,
+                                                      Pageable pageable,
+                                                      String currentUserPhone) {
+        validateCustomerAccess(customerId, currentUserPhone);
         if (!customerRepository.existsById(customerId)) {
             throw new ResourceNotFoundException("Không tìm thấy khách hàng: " + customerId);
         }
@@ -322,6 +333,28 @@ public class LoyaltyService {
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Không tìm thấy khách hàng: " + customerId
             ));
+    }
+
+    private Customer findCustomerByPhone(String phone) {
+        return customerRepository.findByPhone(phone)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Không tìm thấy admin: " + phone
+            ));
+    }
+
+    private void validateCustomerAccess(UUID customerId, String currentUserPhone) {
+        if (currentUserPhone == null || currentUserPhone.isBlank()) {
+            throw new BusinessException("Không xác định được user hiện tại");
+        }
+
+        Customer currentUser = findCustomerByPhone(currentUserPhone);
+        if (currentUser.isAdmin()) {
+            return; // Admin có quyền xem và đổi điểm cho bất kỳ khách hàng nào
+        }
+
+        if (!currentUser.getCustomerId().equals(customerId)) {
+            throw new BusinessException("Bạn không có quyền truy cập thông tin này");
+        }
     }
 
     private double getTierMultiplier(LoyaltyTierConfig config, Tier tier) {

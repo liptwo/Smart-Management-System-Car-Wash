@@ -25,7 +25,7 @@ spring:
       port: ${REDIS_PORT:6379}
 
 jwt:
-  secret: ${JWT_SECRET:dev-secret-key-autowash-pro-256bits-change-in-prod}
+  secret: ${JWT_SECRET:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=}
   expiration: 86400000
   refresh-expiration: 604800000
 

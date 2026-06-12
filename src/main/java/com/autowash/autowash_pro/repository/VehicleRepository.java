@@ -1,13 +1,10 @@
 package com.autowash.autowash_pro.repository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
+import com.autowash.autowash_pro.entity.Vehicle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import com.autowash.autowash_pro.entity.Vehicle;
+import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface VehicleRepository

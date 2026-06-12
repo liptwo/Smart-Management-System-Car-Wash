@@ -11,14 +11,14 @@ import com.autowash.autowash_pro.dto.request.auth.AuthResponse;
 import com.autowash.autowash_pro.dto.request.auth.LoginRequest;
 import com.autowash.autowash_pro.dto.request.auth.RefreshTokenRequest;
 import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;
+import com.autowash.autowash_pro.dto.request.auth.AuthResponse;
+import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;
 import com.autowash.autowash_pro.service.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-
 
 @RestController
 @RequestMapping("/api/auth")

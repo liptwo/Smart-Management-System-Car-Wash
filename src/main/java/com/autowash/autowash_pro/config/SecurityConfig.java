@@ -40,7 +40,10 @@ public class SecurityConfig {
                     "/actuator/health",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
-                    "/v3/api-docs/**"
+                    "/v3/api-docs/**",
+                    
+                    // 🛠️ ĐÃ THÊM ĐƯỜNG DẪN NÀY ĐỂ BỎ QUA TOKEN KHI ADMIN QUẢN LÝ KHÁCH HÀNG TẠI QUẦY:
+                    "/api/admin/customers/**"
                 ).permitAll()
                 .requestMatchers("/api/admin/**")
                     .hasRole("ADMIN")
@@ -65,18 +68,16 @@ public class SecurityConfig {
 
         // Đổi setAllowedOrigins → setAllowedOriginPatterns
         config.setAllowedOriginPatterns(List.of(
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://localhost:*"
-        ));
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://localhost:*",
+                "*"));
         config.setAllowedMethods(List.of(
-            "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
-        ));
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", config);
         return source;
     }
