@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>  <!-- đổi từ 4.0.6 -->
+        <version>4.1.0</version>
         <relativePath/>
     </parent>
     <groupId>com.autowash</groupId>
@@ -170,13 +170,6 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency> -->
 
-
-        <!-- Po -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
 
         <!-- servlet
         <dependency>
