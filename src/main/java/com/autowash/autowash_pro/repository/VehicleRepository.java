@@ -15,6 +15,8 @@ public interface VehicleRepository
 
     List<Vehicle> findByCustomer_CustomerId(UUID customerId);
     Optional<Vehicle> findByLicensePlate(String licensePlate);
+    Optional<Vehicle> findByVehicleIdAndCustomer_CustomerId(
+        UUID vehicleId, UUID customerId);
     boolean existsByLicensePlate(String licensePlate);
     Optional<Vehicle> findByCustomer_CustomerIdAndIsPrimaryTrue(UUID customerId);
 }

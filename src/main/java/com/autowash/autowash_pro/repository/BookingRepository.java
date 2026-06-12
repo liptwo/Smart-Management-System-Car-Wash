@@ -17,7 +17,9 @@ public interface BookingRepository
         extends JpaRepository<Booking, UUID> {
 
     List<Booking> findByCustomer_CustomerId(UUID customerId);
+    List<Booking> findByCustomer_CustomerIdOrderByScheduledAtDesc(UUID customerId);
     List<Booking> findByStatus(BookingStatus status);
+    List<Booking> findByStatusOrderByScheduledAtAsc(BookingStatus status);
     List<Booking> findByCustomer_CustomerIdAndStatus(
         UUID customerId, BookingStatus status);
 
@@ -28,4 +30,10 @@ public interface BookingRepository
     // Tìm booking theo ngày
     List<Booking> findByScheduledAtBetween(
         LocalDateTime from, LocalDateTime to);
+
+    List<Booking> findByScheduledAtBetweenOrderByPriorityScoreDescCreatedAtAsc(
+        LocalDateTime from, LocalDateTime to);
+
+    int countByScheduledAtAndStatusIn(
+        LocalDateTime scheduledAt, List<BookingStatus> statuses);
 }
