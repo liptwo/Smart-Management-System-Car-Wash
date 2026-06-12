@@ -1,12 +1,6 @@
 ALTER TABLE customers
     ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE;
 
-UPDATE customer_points
-SET remaining_points = points
-WHERE type = 'EARN'
-  AND points > 0
-  AND expires_at > NOW();
-
 CREATE TABLE IF NOT EXISTS tier_configs (
     tier                VARCHAR(20) PRIMARY KEY,
     vnd_per_point       DECIMAL(12,2) NOT NULL,
@@ -28,4 +22,4 @@ INSERT INTO tier_configs (
 ON CONFLICT (tier) DO NOTHING;
 
 CREATE INDEX IF NOT EXISTS idx_points_fifo
-    ON customer_points(customer_id, type, remaining_points, expires_at, created_at);
+    ON customer_points(customer_id, type, points, expires_at, created_at);
