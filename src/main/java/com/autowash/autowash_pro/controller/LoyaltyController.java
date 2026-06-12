@@ -1,9 +1,9 @@
-package com.autowash.autowashpro.controller;
+package com.autowash.autowash_pro.controller;
 
-import com.autowash.autowashpro.dto.request.EarnPointsRequest;
-import com.autowash.autowashpro.dto.request.RedeemPointsRequest;
-import com.autowash.autowashpro.dto.response.*;
-import com.autowash.autowashpro.service.LoyaltyService;
+import com.autowash.autowash_pro.dto.request.EarnPointsRequest;
+import com.autowash.autowash_pro.dto.request.RedeemPointsRequest;
+import com.autowash.autowash_pro.dto.response.*;
+import com.autowash.autowash_pro.service.LoyaltyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -13,12 +13,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/api/loyalty")
 @RequiredArgsConstructor
 @Tag(name = "Loyalty", description = "Quản lý điểm thưởng")
 public class LoyaltyController {
@@ -29,7 +32,7 @@ public class LoyaltyController {
     // POST /api/loyalty/earn — Tích điểm (Admin trigger sau khi booking DONE)
     // =========================================================================
 
-    @PostMapping("/api/loyalty/earn")
+    @PostMapping("/earn")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Tích điểm sau khi rửa xe xong")
     public ResponseEntity<EarnPointsResponse> earnPoints(
@@ -41,31 +44,37 @@ public class LoyaltyController {
     // POST /api/loyalty/redeem — Đổi điểm lấy thưởng
     // =========================================================================
 
-    @PostMapping("/api/loyalty/redeem")
+    @PostMapping("/redeem")
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @Operation(summary = "Đổi điểm lấy thưởng (DISCOUNT_10K / FREE_BASIC / FREE_PREMIUM / ADDON)")
     public ResponseEntity<RedeemPointsResponse> redeemPoints(
-            @RequestBody @Valid RedeemPointsRequest request) {
-        return ResponseEntity.ok(loyaltyService.redeemPoints(request));
+            @RequestBody @Valid RedeemPointsRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(
+            loyaltyService.redeemPoints(request, userDetails.getUsername())
+        );
     }
 
     // =========================================================================
     // GET /api/loyalty/balance/{customerId} — Xem số dư điểm (Client)
     // =========================================================================
 
-    @GetMapping("/api/loyalty/balance/{customerId}")
+    @GetMapping("/balance/{customerId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @Operation(summary = "Xem số dư điểm và điểm sắp hết hạn")
     public ResponseEntity<PointBalanceResponse> getBalance(
-            @PathVariable UUID customerId) {
-        return ResponseEntity.ok(loyaltyService.getBalance(customerId));
+            @PathVariable UUID customerId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(
+            loyaltyService.getBalance(customerId, userDetails.getUsername())
+        );
     }
 
     // =========================================================================
     // POST /api/loyalty/tier-review — Trigger rà soát tier (Admin)
     // =========================================================================
 
-    @PostMapping("/api/loyalty/tier-review")
+    @PostMapping("/tier-review")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Trigger rà soát và cập nhật tier thủ công")
     public ResponseEntity<Map<String, String>> triggerTierReview() {
@@ -82,7 +91,10 @@ public class LoyaltyController {
     @Operation(summary = "Xem lịch sử giao dịch điểm (earn / redeem / expire)")
     public ResponseEntity<Page<PointHistoryResponse>> getPointHistory(
             @PathVariable UUID customerId,
-            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable) {
-        return ResponseEntity.ok(loyaltyService.getPointHistory(customerId, pageable));
+            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(
+            loyaltyService.getPointHistory(customerId, pageable, userDetails.getUsername())
+        );
     }
 }

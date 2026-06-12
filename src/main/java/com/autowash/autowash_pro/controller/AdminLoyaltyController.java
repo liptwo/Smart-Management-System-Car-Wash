@@ -1,8 +1,8 @@
-package com.autowash.autowashpro.controller;
+package com.autowash.autowash_pro.controller;
 
-import com.autowash.autowashpro.dto.request.UpdateTierConfigRequest;
-import com.autowash.autowashpro.dto.response.TierConfigResponse;
-import com.autowash.autowashpro.service.LoyaltyService;
+import com.autowash.autowash_pro.dto.request.UpdateTierConfigRequest;
+import com.autowash.autowash_pro.dto.response.TierConfigResponse;
+import com.autowash.autowash_pro.service.LoyaltyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -12,8 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -53,18 +51,9 @@ public class AdminLoyaltyController {
             @RequestBody @Valid UpdateTierConfigRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        UUID adminId = extractAdminId(userDetails);
-        return ResponseEntity.ok(loyaltyService.updateTierConfig(request, adminId));
-    }
-
-    // ─── Helper ───────────────────────────────────────────────────────────────
-
-    private UUID extractAdminId(UserDetails userDetails) {
-        // TODO: [Dev-1] Điều chỉnh theo UserPrincipal của Dev 1 nếu cần
-        try {
-            return UUID.fromString(userDetails.getUsername());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        return ResponseEntity.ok(
+            loyaltyService.updateTierConfig(request, userDetails.getUsername())
+        );
     }
 }
+
