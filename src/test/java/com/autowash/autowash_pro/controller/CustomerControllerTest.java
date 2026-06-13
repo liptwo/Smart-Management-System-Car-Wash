@@ -33,4 +33,16 @@ public class CustomerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+    // Test Case 2: GET Customer Vehicles
+    @Test
+    public void testGetCustomerVehicles_Success() throws Exception {
+        UUID customerId = UUID.randomUUID();
+        
+        when(customerService.getVehiclesByCustomerId(customerId)).thenReturn(new ArrayList<>());
+        
+        mockMvc.perform(get("/api/admin/customers/" + customerId + "/vehicles")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 }
