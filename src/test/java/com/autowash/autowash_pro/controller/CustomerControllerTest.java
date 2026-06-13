@@ -81,4 +81,14 @@ public class CustomerControllerTest {
                 .content(updatedCustomerJson))
                 .andExpect(status().isOk()); 
     }
+
+    // Test Case 6: DELETE Disable Customer Account
+    @Test
+    public void testDisableCustomer_Success() throws Exception {
+        UUID customerId = UUID.randomUUID();
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/admin/customers/" + customerId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()); 
+    }
 }
