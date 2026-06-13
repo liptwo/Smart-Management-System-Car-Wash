@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.autowash.autowash_pro.enums.ServiceType;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
@@ -21,7 +21,7 @@ public class CreateBookingRequest {
 
     @NotNull(message = "scheduledAt không được để trống")
     @Future(message = "Thời gian đặt lịch phải ở tương lai")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
+    @JsonDeserialize(using = LenientLocalDateTimeDeserializer.class)
     private LocalDateTime scheduledAt;
 
     @NotNull(message = "serviceType không được để trống")
