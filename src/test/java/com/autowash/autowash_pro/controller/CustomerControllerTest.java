@@ -45,4 +45,16 @@ public class CustomerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+    // Test Case 3: GET Customer Wash History
+    @Test
+    public void testGetCustomerHistory_Success() throws Exception {
+        UUID customerId = UUID.randomUUID();
+        
+        when(customerService.getBookingHistoryByCustomerId(customerId)).thenReturn(new ArrayList<>());
+        
+        mockMvc.perform(get("/api/admin/customers/" + customerId + "/history")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 }
