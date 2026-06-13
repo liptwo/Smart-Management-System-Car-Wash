@@ -1,8 +1,11 @@
 package com.autowash.autowash_pro.service;
 
 import com.autowash.autowash_pro.dto.request.CustomerRequestDTO;
+import com.autowash.autowash_pro.dto.response.CustomerProfileResponse;
 import com.autowash.autowash_pro.entity.Customer;
 import com.autowash.autowash_pro.enums.Tier;
+import com.autowash.autowash_pro.exception.BusinessException;
+import com.autowash.autowash_pro.exception.ResourceNotFoundException;
 import com.autowash.autowash_pro.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +36,7 @@ public class CustomerService {
         }
 
         Customer customer = Customer.builder()
-                .fullName(dto.getName())
+                .fullName(dto.getFullName())
                 .phone(dto.getPhone())
                 .email(dto.getEmail())
                 .password("$2a$10$X8A2M6fB8z7Gk9b3C2e1o.U9kZ5g6h7i8j9k1l2m3n4o5p6q7r8s9") // Mật khẩu mặc định 123456
@@ -66,7 +69,7 @@ public class CustomerService {
     public Customer updateCustomer(UUID id, CustomerRequestDTO dto) {
         Customer customer = getCustomerById(id);
 
-        customer.setFullName(dto.getName());
+        customer.setFullName(dto.getFullName());
         customer.setPhone(dto.getPhone());
         customer.setEmail(dto.getEmail());
         // Bạn có thể bổ sung thêm customer.setTier(...) nếu muốn cho Admin đổi hạng thẻ
@@ -90,5 +93,62 @@ public class CustomerService {
     // Gọi hàm có sẵn của nhóm để lôi lịch sử đặt lịch rửa xe
     public List<Booking> getBookingHistoryByCustomerId(UUID customerId) {
         return bookingRepository.findByCustomer_CustomerId(customerId);
+    }
+
+    // Lấy thông tin profile của khách hàng hiện tại theo phone
+    @Transactional(readOnly = true)
+    public CustomerProfileResponse getMyProfile(String phone) {
+        Customer customer = customerRepository.findByPhone(phone)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Không tìm thấy tài khoản với số điện thoại: " + phone
+                ));
+
+        return mapToProfileResponse(customer);
+    }
+
+    @Transactional
+    public CustomerProfileResponse updateMyProfile(String phone,
+                                                   CustomerRequestDTO request) {
+        Customer customer = customerRepository.findByPhone(phone)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Không tìm thấy tài khoản với số điện thoại: " + phone
+                ));
+
+        if (!customer.getPhone().equals(request.getPhone())
+                && customerRepository.existsByPhone(request.getPhone())) {
+            throw new BusinessException("Số điện thoại đã được sử dụng");
+        }
+
+        if (request.getEmail() != null
+                && !request.getEmail().isBlank()
+                && !request.getEmail().equals(customer.getEmail())
+                && customerRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException("Email đã được sử dụng");
+        }
+
+        customer.setFullName(request.getFullName());
+        customer.setPhone(request.getPhone());
+        customer.setEmail(request.getEmail());
+
+        Customer savedCustomer = customerRepository.save(customer);
+        return mapToProfileResponse(savedCustomer);
+    }
+
+    // Helper method - Convert Customer entity to CustomerProfileResponse
+    private CustomerProfileResponse mapToProfileResponse(Customer customer) {
+        return CustomerProfileResponse.builder()
+                .customerId(customer.getCustomerId())
+                .fullName(customer.getFullName())
+                .phone(customer.getPhone())
+                .email(customer.getEmail())
+                .tier(customer.getTier())
+                .totalPoints(customer.getTotalPoints())
+                .lifetimePoints(customer.getLifetimePoints())
+                .totalVisits(customer.getTotalVisits())
+                .totalSpend(customer.getTotalSpend())
+                .registeredAt(customer.getRegisteredAt())
+                .lastVisitAt(customer.getLastVisitAt())
+                .isActive(customer.isActive())
+                .build();
     }
 }
