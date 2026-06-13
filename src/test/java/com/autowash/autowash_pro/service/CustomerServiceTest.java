@@ -16,8 +16,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.autowash.autowash_pro.entity.Vehicle;
 import com.autowash.autowash_pro.repository.VehicleRepository;
 
+import com.autowash.autowash_pro.entity.Booking; 
+import com.autowash.autowash_pro.repository.BookingRepository; 
+
 @ExtendWith(MockitoExtension.class)
 public class CustomerServiceTest {
+
+    @Mock
+    private BookingRepository bookingRepository;
 
     @Mock
     private VehicleRepository vehicleRepository;
@@ -34,5 +40,15 @@ public class CustomerServiceTest {
         List<Vehicle> vehicles = customerService.getVehiclesByCustomerId(customerId);
         
         assertNotNull(vehicles);
+    }
+
+    // Test Case 2: Kiểm thử độc lập logic lấy lịch sử rửa xe của Service
+    @Test
+    public void testGetBookingHistoryByCustomerId_ShouldReturnList() {
+        UUID customerId = UUID.randomUUID();
+        when(bookingRepository.findByCustomer_CustomerId(customerId)).thenReturn(new ArrayList<>());
+
+        List<Booking> history = customerService.getBookingHistoryByCustomerId(customerId);
+        assertNotNull(history);
     }
 }
