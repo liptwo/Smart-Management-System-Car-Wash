@@ -57,4 +57,15 @@ public class CustomerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+    // Test Case 4: POST Create New Customer
+    @Test
+    public void testCreateCustomer_Success() throws Exception {
+        String customerJson = "{\"name\":\"Nguyen Van A\",\"phone\":\"0987654321\",\"email\":\"nva@gmail.com\"}";
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/admin/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJson))
+                .andExpect(status().isOk()); 
+    }
 }
