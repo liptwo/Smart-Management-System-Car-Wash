@@ -68,4 +68,17 @@ public class CustomerControllerTest {
                 .content(customerJson))
                 .andExpect(status().isOk()); 
     }
+
+    // Test Case 5: PUT Update Existing Customer
+    @Test
+    public void testUpdateCustomer_Success() throws Exception {
+        UUID customerId = UUID.randomUUID();
+    
+        String updatedCustomerJson = "{\"name\":\"Nguyen Van A Updated\",\"phone\":\"0987654321\",\"email\":\"nva_updated@gmail.com\"}";
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/admin/customers/" + customerId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedCustomerJson))
+                .andExpect(status().isOk()); 
+    }
 }
