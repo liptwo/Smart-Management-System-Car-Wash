@@ -29,4 +29,12 @@ public enum Tier {
             case PLATINUM -> 1.15;
         };
     }
+
+    // 🌟 THÊM LOGIC: Tự động tính toán Hạng dựa trên tổng số điểm tích lũy lũy kế
+    public static Tier getNextTierFromPoints(int points) {
+        if (points >= 1000) return PLATINUM; // Từ 1000 điểm lên PLATINUM
+        if (points >= 300)  return GOLD;     // Từ 300 điểm lên GOLD
+        if (points >= 100)  return SILVER;   // Từ 100 điểm lên SILVER
+        return MEMBER;                       // Dưới 100 điểm giữ hạng MEMBER
+    }
 }
