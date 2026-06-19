@@ -22,6 +22,7 @@ import com.autowash.autowash_pro.entity.Booking;
 import com.autowash.autowash_pro.entity.Customer;
 import com.autowash.autowash_pro.entity.Vehicle;
 import com.autowash.autowash_pro.enums.BookingStatus;
+import com.autowash.autowash_pro.enums.Tier;
 import com.autowash.autowash_pro.exception.BusinessException;
 import com.autowash.autowash_pro.exception.ResourceNotFoundException;
 import com.autowash.autowash_pro.repository.BookingRepository;
@@ -108,7 +109,7 @@ public class BookingService {
                         .orElse(null);
             }
 
-            // 2. 🌟 TỰ ĐỘNG KIỂM TRA BIỂN SỐ VÀ KHỞI TẠO THỰC THỂ XE THẬT DƯỚI DATABASE
+            // 2. TỰ ĐỘNG KIỂM TRA BIỂN SỐ VÀ KHỞI TẠO THỰC THỂ XE THẬT DƯỚI DATABASE
             if (plateTarget != null && !plateTarget.isEmpty()) {
                 final String finalPlate = plateTarget.toUpperCase().trim();
                 final String finalBrand = (modelTarget != null && !modelTarget.isEmpty()) ? modelTarget : "POS Auto";
@@ -248,12 +249,16 @@ public class BookingService {
         return mapToResponse(bookingRepository.save(booking));
     }
 
-    public BookingResponse updateStatus(
+public BookingResponse updateStatus(
             UUID bookingId,
             BookingStatus newStatus) {
 
         Booking booking = findBooking(bookingId);
         BookingStatus oldStatus = booking.getStatus();
+        
+        if (oldStatus == BookingStatus.DONE) {
+            return mapToResponse(booking);
+        }
         
         validateStatusTransition(oldStatus, newStatus);
         booking.setStatus(newStatus);
@@ -277,7 +282,21 @@ public class BookingService {
                 earnRequest.setWashId(savedBooking.getBookingId());
                 earnRequest.setAmountPaid(amountPaid);
 
+                // 1. Thực hiện tích điểm loyalty trước
                 loyaltyService.earnPoints(earnRequest);
+                
+                // 2. Tự động thăng hạng thời gian thực sau khi nạp điểm thành công
+                Customer currentCustomer = savedBooking.getCustomer();
+                Customer updatedCustomer = customerRepository.findById(currentCustomer.getCustomerId()).orElse(currentCustomer);
+
+                int currentPoints = updatedCustomer.getLifetimePoints(); 
+                Tier newTier = Tier.getNextTierFromPoints(currentPoints);
+
+                if (updatedCustomer.getTier() != newTier) {
+                    updatedCustomer.setTier(newTier);
+                    customerRepository.save(updatedCustomer);
+                    System.out.println("[Promotion] Khách hàng " + updatedCustomer.getFullName() + " đã tự động thăng hạng lên: " + newTier);
+                }
                 
                 System.out.println("[Automation] Đơn đặt lịch " + bookingId + " hoàn tất. Đã tự động tích điểm loyalty về đúng ID khách.");
             }
@@ -416,8 +435,6 @@ public class BookingService {
         Customer customer = booking.getCustomer();
         Vehicle vehicle = booking.getVehicle();
         
-        // Đoạn này kiểm tra nếu thuộc tính vehicleType trong Entity của bạn là dạng String hay Enum 
-        // để map dữ liệu ra cho mượt mà không bị lỗi kiểu dữ liệu.
         String vType = "CAR";
         if (vehicle.getVehicleType() != null) {
             vType = vehicle.getVehicleType().toString();
