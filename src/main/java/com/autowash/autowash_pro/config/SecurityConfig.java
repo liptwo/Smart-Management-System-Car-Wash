@@ -43,8 +43,10 @@ public class SecurityConfig {
                     "/swagger-ui.html",
                     "/v3/api-docs/**",
                     
-                    // 🛠️ ĐÃ THÊM ĐƯỜNG DẪN NÀY ĐỂ BỎ QUA TOKEN KHI ADMIN QUẢN LÝ KHÁCH HÀNG TẠI QUẦY:
-                    "/api/admin/customers/**"
+                    // THÊM ĐƯỜNG DẪN NÀY ĐỂ BỎ QUA TOKEN KHI ADMIN QUẢN LÝ KHÁCH HÀNG TẠI QUẦY:
+                    "/api/admin/customers/**",
+                    "/api/admin/bookings/**",
+                    "/api/bookings/**"
                 ).permitAll()
                 .requestMatchers("/api/admin/**")
                     .hasRole("ADMIN")

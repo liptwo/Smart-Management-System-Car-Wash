@@ -24,6 +24,12 @@ public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
+    private VehicleRepository vehicleRepository;
+
     // Lấy toàn bộ danh sách khách hàng từ database đám mây Supabase
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
@@ -52,33 +58,41 @@ public class CustomerService {
         return customerRepository.save(customer);
     }
 
-    @Autowired
-    private BookingRepository bookingRepository;
-
-    @Autowired
-    private VehicleRepository vehicleRepository;
-
     // 1. Logic lấy chi tiết 1 khách hàng theo ID
     public Customer getCustomerById(UUID id) {
         return customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng với ID: " + id));
     }
 
-    // 2. Logic cập nhật thông tin khách hàng
+    // 2. Logic cập nhật thông tin khách hàng (Đã loại bỏ hoàn toàn check isActive từ DTO để hết sạch lỗi đỏ)
     @Transactional
     public Customer updateCustomer(UUID id, CustomerRequestDTO dto) {
         Customer customer = getCustomerById(id);
 
-        customer.setFullName(dto.getFullName());
-        customer.setPhone(dto.getPhone());
-        customer.setEmail(dto.getEmail());
-        // Bạn có thể bổ sung thêm customer.setTier(...) nếu muốn cho Admin đổi hạng thẻ
-        // tại đây
+        if (dto.getFullName() != null && !dto.getFullName().isBlank()) {
+            customer.setFullName(dto.getFullName());
+        }
+        
+        if (dto.getPhone() != null && !dto.getPhone().isBlank()) {
+            customer.setPhone(dto.getPhone());
+        }
+        
+        if (dto.getEmail() != null) {
+            customer.setEmail(dto.getEmail());
+        }
 
         return customerRepository.save(customer);
     }
 
-    // 3. Logic vô hiệu hóa khách hàng (Xóa mềm)
+    // 3. Logic thay đổi trạng thái linh hoạt (Đóng/Mở khóa) không phụ thuộc DTO
+    @Transactional
+    public void toggleCustomerStatus(UUID id, boolean status) {
+        Customer customer = getCustomerById(id);
+        customer.setActive(status);
+        customerRepository.save(customer);
+    }
+
+    // Giữ nguyên hàm cũ để không lỗi các chức năng khác
     @Transactional
     public void disableCustomer(UUID id) {
         Customer customer = getCustomerById(id);
@@ -107,8 +121,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public CustomerProfileResponse updateMyProfile(String phone,
-                                                   CustomerRequestDTO request) {
+    public CustomerProfileResponse updateMyProfile(String phone, CustomerRequestDTO request) {
         Customer customer = customerRepository.findByPhone(phone)
                 .orElseThrow(() -> new ResourceNotFoundException(
                     "Không tìm thấy tài khoản với số điện thoại: " + phone
@@ -134,7 +147,6 @@ public class CustomerService {
         return mapToProfileResponse(savedCustomer);
     }
 
-    // Helper method - Convert Customer entity to CustomerProfileResponse
     private CustomerProfileResponse mapToProfileResponse(Customer customer) {
         return CustomerProfileResponse.builder()
                 .customerId(customer.getCustomerId())

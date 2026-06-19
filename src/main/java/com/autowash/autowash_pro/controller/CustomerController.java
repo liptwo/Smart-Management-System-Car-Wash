@@ -21,6 +21,25 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
+    // 🌟 ENDPOINT MỚI THÊM: Kiểm tra nhanh số điện thoại phục vụ luồng POS thông minh ngoài quầy
+    // GET http://localhost:8080/api/admin/customers/check?phone=0912223333
+    @GetMapping("/check")
+    public ResponseEntity<?> checkCustomerByPhone(@RequestParam String phone) {
+        // Gọi xuống service lấy danh sách khách hàng và lọc theo số điện thoại
+        // Hoặc nếu CustomerService của bạn có hàm findByPhone thì viết trực tiếp sẽ tối ưu hơn
+        return customerService.getAllCustomers().stream()
+            .filter(c -> c.getPhone() != null && c.getPhone().trim().equals(phone.trim()))
+            .findFirst()
+            .map(c -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("exists", true);
+                map.put("fullName", c.getFullName());
+                map.put("tier", c.getTier() != null ? c.getTier().toString() : "MEMBER");
+                return ResponseEntity.ok(map);
+            })
+            .orElse(ResponseEntity.ok(Map.of("exists", false)));
+    }
+
     // Endpoint lấy danh sách khách hàng thật - Đã xử lý triệt tiêu vòng lặp JSON bằng DTO động
     @GetMapping
     public ResponseEntity<?> getAllCustomers() {
@@ -80,7 +99,6 @@ public class CustomerController {
     }
 
     // 1. Endpoint: GET http://localhost:8080/api/admin/customers/{id}
-    // 🛠️ ĐÃ CẬP NHẬT: Phẳng hóa dữ liệu để tránh lỗi Nesting Depth tuần hoàn khi click xem chi tiết
     @GetMapping("/{id}")
     public ResponseEntity<?> getCustomerById(@PathVariable UUID id) {
         Customer c = customerService.getCustomerById(id);
@@ -134,7 +152,6 @@ public class CustomerController {
     }
 
     // Endpoint: GET http://localhost:8080/api/admin/customers/{id}/vehicles
-    // 🛠️ ĐÃ CẬP NHẬT: Ép dữ liệu xe về dạng Map phẳng thô, cắt đứt dây liên kết ngược về Customer Entity
     @GetMapping("/{id}/vehicles")
     public ResponseEntity<?> getVehiclesByCustomerId(@PathVariable UUID id) {
         List<Vehicle> vehicles = customerService.getVehiclesByCustomerId(id);
@@ -153,7 +170,6 @@ public class CustomerController {
     }
 
     // Endpoint: GET http://localhost:8080/api/admin/customers/{id}/history
-    // 🛠️ ĐÃ CẬP NHẬT: Ép dữ liệu lịch đặt về dạng Map phẳng thô, cắt đứt dây liên kết ngược về WashHistory/Customer
     @GetMapping("/{id}/history")
     public ResponseEntity<?> getBookingHistoryByCustomerId(@PathVariable UUID id) {
         List<Booking> bookings = customerService.getBookingHistoryByCustomerId(id);

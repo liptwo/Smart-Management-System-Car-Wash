@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.autowash.autowash_pro.enums.Tier;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -88,22 +89,27 @@ public class Customer {
     @Builder.Default
     private boolean isAdmin = false;
 
-    // Relationships
+    // ==========================================
+    // Relationships (Đã chặn lặp vô hạn tuần hoàn JSON)
+    // ==========================================
     @OneToMany(mappedBy = "customer",
                cascade = CascadeType.ALL,
                fetch = FetchType.LAZY)
     @Builder.Default
+    @JsonIgnoreProperties("customer") 
     private List<Vehicle> vehicles = new ArrayList<>();
 
     @OneToMany(mappedBy = "customer",
                cascade = CascadeType.ALL,
                fetch = FetchType.LAZY)
     @Builder.Default
+    @JsonIgnoreProperties("customer") 
     private List<Booking> bookings = new ArrayList<>();
 
     @OneToMany(mappedBy = "customer",
                cascade = CascadeType.ALL,
                fetch = FetchType.LAZY)
     @Builder.Default
+    @JsonIgnoreProperties("customer") 
     private List<CustomerPoints> points = new ArrayList<>();
 }
