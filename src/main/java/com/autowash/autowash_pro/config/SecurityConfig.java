@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,27 +36,44 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      
             .authorizeHttpRequests(auth -> auth
+        
+                .requestMatchers(HttpMethod.PATCH, "/api/admin/promotions/**").permitAll()
+                .requestMatchers(HttpMethod.PATCH, "/api/admin/**").permitAll()
+                
+                // Mở cửa cho các phương thức GET và POST của promotions
+                .requestMatchers(HttpMethod.GET, "/api/admin/promotions/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/admin/promotions/**").permitAll()
+
+                // THÊM: Mở cửa thông suốt tự do cho các phương thức của quản lý bài viết (Articles)
+                .requestMatchers(HttpMethod.GET, "/api/admin/articles/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/admin/articles/**").permitAll()
+                .requestMatchers(HttpMethod.PATCH, "/api/admin/articles/**").permitAll()
+
+                // Whitelist các đường dẫn mở tự do (Không cần Token)
                 .requestMatchers(
                     "/api/auth/**",
                     "/actuator/health",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/v3/api-docs/**",
-                    
-                    // THÊM ĐƯỜNG DẪN NÀY ĐỂ BỎ QUA TOKEN KHI ADMIN QUẢN LÝ KHÁCH HÀNG TẠI QUẦY:
                     "/api/admin/customers/**",
                     "/api/admin/bookings/**",
                     "/api/bookings/**"
                 ).permitAll()
-                .requestMatchers("/api/admin/**")
-                    .hasRole("ADMIN")
+                
+                // Các đường dẫn Admin tổng quát còn lại công chứng quyền ADMIN
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                
+                // Phân quyền khách hàng và admin dùng chung
                 .requestMatchers(
                     "/api/customers/**",
                     "/api/bookings/**",
                     "/api/loyalty/**",
                     "/api/vehicles/**"
                 ).hasAnyRole("CUSTOMER", "ADMIN")
+                
                 .anyRequest().authenticated()
             )
             .userDetailsService(userDetailsService)
@@ -69,7 +87,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Đổi setAllowedOrigins → setAllowedOriginPatterns
+        // Cấu hình danh sách tên miền Frontend được phép kết nối an toàn
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:3000",
                 "http://localhost:5173",
