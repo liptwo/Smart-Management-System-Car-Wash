@@ -30,8 +30,24 @@ public class CustomerService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    // Lấy toàn bộ danh sách khách hàng từ database đám mây Supabase
-    public List<Customer> getAllCustomers() {
+    // 🌟 THAY THẾ & NÂNG CẤP HÀM NÀY: Lấy danh sách khách hàng kết hợp bộ lọc Tìm kiếm và Phân hạng Tier
+    public List<Customer> getAdminCustomers(String keyword, String tierStr) {
+        // 1. Nếu Admin điền từ khóa vào ô Search -> Ưu tiên tìm kiếm theo Tên hoặc Số điện thoại
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return customerRepository.searchCustomers(keyword.trim());
+        }
+        
+        // 2. Nếu Admin click chọn bộ lọc phân hạng Tier cụ thể (MEMBER, SILVER, GOLD, PLATINUM)
+        if (tierStr != null && !tierStr.equalsIgnoreCase("ALL")) {
+            try {
+                Tier tier = Tier.valueOf(tierStr.toUpperCase());
+                return customerRepository.findByTier(tier);
+            } catch (IllegalArgumentException e) {
+                // Nếu chuỗi tier truyền lên không hợp lệ, tự động bỏ qua để rơi xuống findAll
+            }
+        }
+        
+        // 3. Mặc định: Trả về toàn bộ danh sách khách hàng từ Supabase
         return customerRepository.findAll();
     }
 
@@ -46,7 +62,7 @@ public class CustomerService {
                 .phone(dto.getPhone())
                 .email(dto.getEmail())
                 .password("$2a$10$X8A2M6fB8z7Gk9b3C2e1o.U9kZ5g6h7i8j9k1l2m3n4o5p6q7r8s9") // Mật khẩu mặc định 123456
-                .tier(Tier.MEMBER) // Gán kiểu Enum chuẩn của bạn
+                .tier(Tier.MEMBER) 
                 .totalPoints(0)
                 .lifetimePoints(0)
                 .totalVisits(0)
@@ -64,7 +80,7 @@ public class CustomerService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng với ID: " + id));
     }
 
-    // 2. Logic cập nhật thông tin khách hàng (Đã loại bỏ hoàn toàn check isActive từ DTO để hết sạch lỗi đỏ)
+    // 2. Logic cập nhật thông tin khách hàng
     @Transactional
     public Customer updateCustomer(UUID id, CustomerRequestDTO dto) {
         Customer customer = getCustomerById(id);

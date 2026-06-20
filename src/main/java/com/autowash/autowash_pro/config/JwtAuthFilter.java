@@ -1,6 +1,5 @@
 package com.autowash.autowash_pro.config;
 
-
 import java.io.IOException;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -30,6 +28,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
+        // 🌟 VÁ LỖI 403: Cho phép bypass qua bộ lọc JWT Filter đối với toàn bộ API promotions
+        String requestURI = request.getRequestURI();
+        if (requestURI != null && requestURI.contains("/api/admin/promotions")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         final String authHeader = request.getHeader("Authorization");
 

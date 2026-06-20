@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.data.jpa.repository.EntityGraph; // 🌟 Thêm import này
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,32 +15,32 @@ import com.autowash.autowash_pro.enums.BookingStatus;
 public interface BookingRepository
         extends JpaRepository<Booking, UUID> {
 
-    // Thêm EntityGraph để gom cụm quan hệ Customer và Vehicle khi tìm theo ID khách
-    @EntityGraph(attributePaths = {"customer", "vehicle"})
+    // 🌟 BỔ SUNG "washHistory" VÀO TẤT CẢ CÁC KHU VỰC ENTITYGRAPH ĐỂ TRIỆT TIÊU N+1 LỊCH SỬ
+    @EntityGraph(attributePaths = {"customer", "vehicle", "washHistory"})
     List<Booking> findByCustomer_CustomerId(UUID customerId);
 
-    @EntityGraph(attributePaths = {"customer", "vehicle"})
+    @EntityGraph(attributePaths = {"customer", "vehicle", "washHistory"})
     List<Booking> findByCustomer_CustomerIdOrderByScheduledAtDesc(UUID customerId);
 
-    @EntityGraph(attributePaths = {"customer", "vehicle"})
+    @EntityGraph(attributePaths = {"customer", "vehicle", "washHistory"})
     List<Booking> findByStatus(BookingStatus status);
 
-    @EntityGraph(attributePaths = {"customer", "vehicle"})
+    @EntityGraph(attributePaths = {"customer", "vehicle", "washHistory"})
     List<Booking> findByStatusOrderByScheduledAtAsc(BookingStatus status);
 
-    @EntityGraph(attributePaths = {"customer", "vehicle"})
+    @EntityGraph(attributePaths = {"customer", "vehicle", "washHistory"})
     List<Booking> findByCustomer_CustomerIdAndStatus(
         UUID customerId, BookingStatus status);
 
-    // Đếm pending booking của customer (Hàm đếm số lượng thì giữ nguyên, không cần Join)
     int countByCustomer_CustomerIdAndStatus(
         UUID customerId, BookingStatus status);
 
-    @EntityGraph(attributePaths = {"customer", "vehicle"})
+    // 🌟 ĐẶC BIỆT LÀ 2 HÀM LỌC LỊCH HẸN ADMIN NÀY:
+    @EntityGraph(attributePaths = {"customer", "vehicle", "washHistory"})
     List<Booking> findByScheduledAtBetween(
         LocalDateTime from, LocalDateTime to);
 
-    @EntityGraph(attributePaths = {"customer", "vehicle"})
+    @EntityGraph(attributePaths = {"customer", "vehicle", "washHistory"})
     List<Booking> findByScheduledAtBetweenOrderByPriorityScoreDescCreatedAtAsc(
         LocalDateTime from, LocalDateTime to);
 

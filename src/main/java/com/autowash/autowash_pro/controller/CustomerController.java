@@ -21,13 +21,10 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
-    // 🌟 ENDPOINT MỚI THÊM: Kiểm tra nhanh số điện thoại phục vụ luồng POS thông minh ngoài quầy
-    // GET http://localhost:8080/api/admin/customers/check?phone=0912223333
+    // 1. Endpoint: Kiểm tra nhanh số điện thoại phục vụ luồng POS thông minh ngoài quầy
     @GetMapping("/check")
     public ResponseEntity<?> checkCustomerByPhone(@RequestParam String phone) {
-        // Gọi xuống service lấy danh sách khách hàng và lọc theo số điện thoại
-        // Hoặc nếu CustomerService của bạn có hàm findByPhone thì viết trực tiếp sẽ tối ưu hơn
-        return customerService.getAllCustomers().stream()
+        return customerService.getAdminCustomers(phone, "ALL").stream()
             .filter(c -> c.getPhone() != null && c.getPhone().trim().equals(phone.trim()))
             .findFirst()
             .map(c -> {
@@ -40,10 +37,15 @@ public class CustomerController {
             .orElse(ResponseEntity.ok(Map.of("exists", false)));
     }
 
-    // Endpoint lấy danh sách khách hàng thật - Đã xử lý triệt tiêu vòng lặp JSON bằng DTO động
+    // 2. 🌟 ENDPOINT ĐÃ NÂNG CẤP: Hỗ trợ đắc lực bộ lọc Ô Search và các Tab Tier từ Frontend
+    // GET http://localhost:8080/api/admin/customers?search=...&tier=GOLD
     @GetMapping
-    public ResponseEntity<?> getAllCustomers() {
-        List<Customer> customers = customerService.getAllCustomers();
+    public ResponseEntity<?> getAllCustomers(
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "tier", required = false, defaultValue = "ALL") String tier) {
+        
+        // 🌟 Đồng bộ gọi hàm xử lý thông minh từ Service thay vì findAll() thuần túy
+        List<Customer> customers = customerService.getAdminCustomers(search, tier);
         
         List<Map<String, Object>> cleanResponse = customers.stream().map(c -> {
             Map<String, Object> map = new HashMap<>();
@@ -87,7 +89,7 @@ public class CustomerController {
         return ResponseEntity.ok(cleanResponse);
     }
 
-    // Endpoint nhận dữ liệu từ Form popup dưới dạng JSON để lưu vào database
+    // 3. Endpoint nhận dữ liệu từ Form popup để lưu vào database tại quầy
     @PostMapping
     public ResponseEntity<?> addCustomer(@RequestBody CustomerRequestDTO request) {
         try {
@@ -98,7 +100,7 @@ public class CustomerController {
         }
     }
 
-    // 1. Endpoint: GET http://localhost:8080/api/admin/customers/{id}
+    // 4. Endpoint lấy thông tin chi tiết 1 khách hàng phục vụ Modal Xem Chi Tiết
     @GetMapping("/{id}")
     public ResponseEntity<?> getCustomerById(@PathVariable UUID id) {
         Customer c = customerService.getCustomerById(id);
@@ -116,7 +118,7 @@ public class CustomerController {
         return ResponseEntity.ok(map);
     }
 
-    // 2. Endpoint: PUT http://localhost:8080/api/admin/customers/{id}
+    // 5. Endpoint chỉnh sửa thông tin hoặc Đóng/Mở khóa Switch trạng thái tài khoản
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCustomer(
             @PathVariable UUID id, 
@@ -144,14 +146,14 @@ public class CustomerController {
         return ResponseEntity.ok(map);
     }
 
-    // 3. Endpoint: DELETE http://localhost:8080/api/admin/customers/{id}
+    // 6. Endpoint khóa tài khoản khách hàng nhanh
     @DeleteMapping("/{id}")
     public ResponseEntity<String> disableCustomer(@PathVariable UUID id) {
         customerService.disableCustomer(id);
         return ResponseEntity.ok("Đã vô hiệu hóa khách hàng thành công!");
     }
 
-    // Endpoint: GET http://localhost:8080/api/admin/customers/{id}/vehicles
+    // 7. Endpoint lấy danh sách xe của riêng khách hàng đó
     @GetMapping("/{id}/vehicles")
     public ResponseEntity<?> getVehiclesByCustomerId(@PathVariable UUID id) {
         List<Vehicle> vehicles = customerService.getVehiclesByCustomerId(id);
@@ -169,7 +171,7 @@ public class CustomerController {
         return ResponseEntity.ok(cleanVehicles);
     }
 
-    // Endpoint: GET http://localhost:8080/api/admin/customers/{id}/history
+    // 8. Endpoint lôi lịch sử đặt lịch rửa xe của riêng khách hàng đó
     @GetMapping("/{id}/history")
     public ResponseEntity<?> getBookingHistoryByCustomerId(@PathVariable UUID id) {
         List<Booking> bookings = customerService.getBookingHistoryByCustomerId(id);
