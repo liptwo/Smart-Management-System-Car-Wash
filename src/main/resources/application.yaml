@@ -36,5 +36,8 @@ supabase:
   url: ${SUPABASE_URL:http://localhost}
   key: ${SUPABASE_ANON_KEY:dummy-key}
 
+cors:
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173}
+
 server:
   port: 8080

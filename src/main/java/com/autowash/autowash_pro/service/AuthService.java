@@ -7,16 +7,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.autowash.autowash_pro.config.JwtUtil;
-import com.autowash.autowash_pro.dto.request.auth.AuthResponse;
+import com.autowash.autowash_pro.dto.response.auth.AuthResponse;
 import com.autowash.autowash_pro.dto.request.auth.LoginRequest;
 import com.autowash.autowash_pro.dto.request.auth.RefreshTokenRequest;
 import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;
+
 import com.autowash.autowash_pro.entity.Customer;
 import com.autowash.autowash_pro.exception.BusinessException;
 import com.autowash.autowash_pro.exception.ResourceNotFoundException;
 import com.autowash.autowash_pro.repository.CustomerRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.autowash.autowash_pro.exception.BusinessException;
 
 @Service
 @RequiredArgsConstructor

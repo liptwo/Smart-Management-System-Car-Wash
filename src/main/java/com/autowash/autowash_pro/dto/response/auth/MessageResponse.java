@@ -1,4 +1,4 @@
-package com.autowash.autowash_pro.dto.request.auth;
+package com.autowash.autowash_pro.dto.response.auth;
 import lombok.*;
 
 @Getter @Setter

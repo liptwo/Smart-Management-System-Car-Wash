@@ -1,7 +1,7 @@
 package com.autowash.autowash_pro.controller;
 
-import com.autowash.autowash_pro.dto.request.UpdateTierConfigRequest;
-import com.autowash.autowash_pro.dto.response.TierConfigResponse;
+import com.autowash.autowash_pro.dto.request.loyalty.UpdateTierConfigRequest;
+import com.autowash.autowash_pro.dto.response.loyalty.TierConfigResponse;
 import com.autowash.autowash_pro.service.LoyaltyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

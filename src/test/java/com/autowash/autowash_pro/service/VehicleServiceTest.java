@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.autowash.autowash_pro.dto.vehicle.VehicleResponse;
+import com.autowash.autowash_pro.dto.response.vehicle.VehicleResponse;
 import com.autowash.autowash_pro.entity.Customer;
 import com.autowash.autowash_pro.entity.Vehicle;
 import com.autowash.autowash_pro.exception.BusinessException;
@@ -72,7 +72,7 @@ class VehicleServiceTest {
         when(customerRepository.findByPhone(phone)).thenReturn(Optional.of(customer));
         when(vehicleRepository.existsByLicensePlate("ABC123")).thenReturn(true);
 
-        var req = new com.autowash.autowash_pro.dto.vehicle.VehicleRequest("ABC123", "Car", "B", "C", false);
+        var req = new com.autowash.autowash_pro.dto.request.vehicle.VehicleRequest("ABC123", "Car", "B", "C", false);
 
         assertThrows(BusinessException.class, () -> vehicleService.createVehicle(phone, req));
     }
