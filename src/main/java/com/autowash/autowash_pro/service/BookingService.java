@@ -53,6 +53,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final CustomerRepository customerRepository;
     private final VehicleRepository vehicleRepository;
+    private final NotificationService notificationService;
     private final LoyaltyService loyaltyService;
 
     public BookingResponse createBooking(
@@ -246,7 +247,9 @@ public class BookingService {
         }
 
         booking.setStatus(BookingStatus.CANCELLED);
-        return mapToResponse(bookingRepository.save(booking));
+        Booking savedBooking = bookingRepository.save(booking);
+        notificationService.sendBookingStatusChanged(savedBooking);
+        return mapToResponse(savedBooking);
     }
 
 public BookingResponse updateStatus(
@@ -264,7 +267,7 @@ public BookingResponse updateStatus(
         booking.setStatus(newStatus);
         
         Booking savedBooking = bookingRepository.save(booking);
-
+        notificationService.sendBookingStatusChanged(savedBooking);
         if (oldStatus != BookingStatus.DONE && newStatus == BookingStatus.DONE) {
             if (savedBooking.getCustomer() != null) {
                 

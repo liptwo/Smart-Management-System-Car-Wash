@@ -38,6 +38,7 @@ public class LoyaltyService {
     private final CustomerRepository customerRepository;
     private final CustomerPointsRepository customerPointsRepository;
     private final LoyaltyTierConfigRepository loyaltyTierConfigRepository;
+    private final NotificationService notificationService;
 
     // =========================================================================
     // Admin: Xem cấu hình điểm thưởng
@@ -136,9 +137,14 @@ public class LoyaltyService {
 
         customerPointsRepository.save(pointLog);
 
-        // Kiểm tra và nâng tier nếu đủ điều kiện
-        checkAndUpgradeTier(customer);
+        Tier oldTier = customer.getTier();
+        checkAndUpdateTier(customer);
         customerRepository.save(customer);
+
+        notificationService.sendPointsEarned(customer, points, customer.getTotalPoints());
+        if (customer.getTier() != oldTier) {
+            notificationService.sendTierChanged(customer, oldTier, customer.getTier());
+        }
 
         log.info("Khách {} tích được {} điểm | amountPaid={} | tier={}",
             customer.getCustomerId(), points, request.getAmountPaid(), customer.getTier());
@@ -261,9 +267,12 @@ public class LoyaltyService {
 
         for (Customer customer : customers) {
             Tier oldTier = customer.getTier();
-            checkAndUpgradeTier(customer);
+            checkAndUpdateTier(customer);
             customerRepository.save(customer);
-            if (customer.getTier().ordinal() > oldTier.ordinal()) upgraded++;
+            if (customer.getTier() != oldTier) {
+                upgraded++;
+                notificationService.sendTierChanged(customer, oldTier, customer.getTier());
+            }
         }
 
         log.info("[TierReview] Kết thúc: {} khách được nâng tier", upgraded);
@@ -407,15 +416,15 @@ public class LoyaltyService {
      * nhưng cần thêm query từ WashHistory (Dev 3 quản lý).
      * TODO: [Dev-4] Đổi sang dùng countVisitsInLast12Months() khi Dev 3 sẵn sàng.
      */
-    private void checkAndUpgradeTier(Customer customer) {
+    private void checkAndUpdateTier(Customer customer) {
         int visits = customer.getTotalVisits();
         Tier newTier = visits >= 50 ? Tier.PLATINUM
                      : visits >= 25 ? Tier.GOLD
                      : visits >= 10 ? Tier.SILVER
                                     : Tier.MEMBER;
 
-        if (newTier.ordinal() > customer.getTier().ordinal()) {
-            log.info("Khách {} được nâng tier {} → {}",
+        if (newTier != customer.getTier()) {
+            log.info("Khách {} đổi tier {} → {}",
                 customer.getCustomerId(), customer.getTier(), newTier);
             customer.setTier(newTier);
         }
