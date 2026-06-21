@@ -1,5 +1,11 @@
 package com.autowash.autowash_pro.service;
 
+import java.util.Optional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.autowash.autowash_pro.config.JwtUtil;
 import com.autowash.autowash_pro.dto.response.auth.AuthResponse;
 import com.autowash.autowash_pro.dto.request.auth.LoginRequest;
@@ -7,6 +13,7 @@ import com.autowash.autowash_pro.dto.request.auth.RefreshTokenRequest;
 import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;
 
 import com.autowash.autowash_pro.entity.Customer;
+import com.autowash.autowash_pro.exception.BusinessException;
 import com.autowash.autowash_pro.exception.ResourceNotFoundException;
 import com.autowash.autowash_pro.repository.CustomerRepository;
 
@@ -56,11 +63,11 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
+        String identifier = request.getEmailOrPhone().trim();
 
-        Customer customer = customerRepository
-            .findByPhone(request.getPhone())
+        Customer customer = findCustomerByEmailOrPhone(identifier)
             .orElseThrow(() ->
-                new BusinessException("Số điện thoại hoặc mật khẩu không đúng"));
+                new BusinessException("Email hoặc số điện thoại hoặc mật khẩu không đúng"));
 
         if (!customer.isActive()) {
             throw new BusinessException("Tài khoản đã bị khóa");
@@ -69,10 +76,21 @@ public class AuthService {
         if (!passwordEncoder.matches(
                 request.getPassword(), customer.getPassword())) {
             throw new BusinessException(
-                "Số điện thoại hoặc mật khẩu không đúng");
+                "Email hoặc số điện thoại hoặc mật khẩu không đúng");
         }
 
         return buildAuthResponse(customer);
+    }
+
+    private Optional<Customer> findCustomerByEmailOrPhone(String identifier) {
+        if (isEmail(identifier)) {
+            return customerRepository.findByEmail(identifier);
+        }
+        return customerRepository.findByPhone(identifier);
+    }
+
+    private boolean isEmail(String value) {
+        return value != null && value.contains("@");
     }
 
     public AuthResponse refreshToken(RefreshTokenRequest request) {

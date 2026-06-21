@@ -43,7 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Đăng nhập bằng phone + password")
+    @Operation(summary = "Đăng nhập bằng email hoặc phone + password")
     public ResponseEntity<AuthResponse> login(
             @RequestBody @Valid LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));

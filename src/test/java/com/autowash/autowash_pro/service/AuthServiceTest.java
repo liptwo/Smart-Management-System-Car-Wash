@@ -23,7 +23,6 @@ import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;
 import com.autowash.autowash_pro.entity.Customer;
 import com.autowash.autowash_pro.enums.Tier;
 import com.autowash.autowash_pro.exception.BusinessException;
-import com.autowash.autowash_pro.exception.ResourceNotFoundException;
 import com.autowash.autowash_pro.repository.CustomerRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,7 +90,22 @@ class AuthServiceTest {
     void login_ShouldReturnAuthResponse_WhenCredentialsAreValid() {
         LoginRequest request = new LoginRequest("0987654321", "password123");
 
-        when(customerRepository.findByPhone(request.getPhone())).thenReturn(Optional.of(customer));
+        when(customerRepository.findByPhone(request.getEmailOrPhone())).thenReturn(Optional.of(customer));
+        when(passwordEncoder.matches(request.getPassword(), customer.getPassword())).thenReturn(true);
+        when(jwtUtil.generateAccessToken(any(), any())).thenReturn("mockedAccessToken");
+        when(jwtUtil.generateRefreshToken(any())).thenReturn("mockedRefreshToken");
+
+        AuthResponse response = authService.login(request);
+
+        assertNotNull(response);
+        assertEquals("mockedAccessToken", response.getAccessToken());
+    }
+
+    @Test
+    void login_ShouldReturnAuthResponse_WhenLoggingInWithEmail() {
+        LoginRequest request = new LoginRequest("a@gmail.com", "password123");
+
+        when(customerRepository.findByEmail(request.getEmailOrPhone())).thenReturn(Optional.of(customer));
         when(passwordEncoder.matches(request.getPassword(), customer.getPassword())).thenReturn(true);
         when(jwtUtil.generateAccessToken(any(), any())).thenReturn("mockedAccessToken");
         when(jwtUtil.generateRefreshToken(any())).thenReturn("mockedRefreshToken");
@@ -107,7 +121,7 @@ class AuthServiceTest {
         LoginRequest request = new LoginRequest("0987654321", "password123");
         customer.setActive(false);
 
-        when(customerRepository.findByPhone(request.getPhone())).thenReturn(Optional.of(customer));
+        when(customerRepository.findByPhone(request.getEmailOrPhone())).thenReturn(Optional.of(customer));
 
         BusinessException exception = assertThrows(BusinessException.class, () -> authService.login(request));
         assertEquals("Tài khoản đã bị khóa", exception.getMessage());
@@ -117,11 +131,11 @@ class AuthServiceTest {
     void login_ShouldThrowException_WhenPasswordIsIncorrect() {
         LoginRequest request = new LoginRequest("0987654321", "wrongPassword");
 
-        when(customerRepository.findByPhone(request.getPhone())).thenReturn(Optional.of(customer));
+        when(customerRepository.findByPhone(request.getEmailOrPhone())).thenReturn(Optional.of(customer));
         when(passwordEncoder.matches(request.getPassword(), customer.getPassword())).thenReturn(false);
 
         BusinessException exception = assertThrows(BusinessException.class, () -> authService.login(request));
-        assertEquals("Số điện thoại hoặc mật khẩu không đúng", exception.getMessage());
+        assertEquals("Email hoặc số điện thoại hoặc mật khẩu không đúng", exception.getMessage());
     }
 
     @Test
