@@ -1,4 +1,4 @@
-package com.autowash.autowash_pro.dto.request;
+package com.autowash.autowash_pro.dto.request.customer;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

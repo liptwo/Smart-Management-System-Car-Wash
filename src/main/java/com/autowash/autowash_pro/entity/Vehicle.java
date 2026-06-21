@@ -1,10 +1,10 @@
 package com.autowash.autowash_pro.entity;
 
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +27,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// 🌟 ĐÃ THÊM: Ngắt bỏ lớp bọc Hibernate Proxy khi thực hiện bốc tách và parse luồng stream map dữ liệu danh sách xe
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Vehicle {
 
     @Id
@@ -36,6 +38,7 @@ public class Vehicle {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnoreProperties({"vehicles", "bookings", "points"}) // Ngăn chặn vòng lặp vô hạn tuần hoàn JSON khi liên kết ngược về chủ xe
     private Customer customer;
 
     @Column(name = "license_plate",

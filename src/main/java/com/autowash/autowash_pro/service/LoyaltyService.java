@@ -1,9 +1,9 @@
 package com.autowash.autowash_pro.service;
 
-import com.autowash.autowash_pro.dto.request.EarnPointsRequest;
-import com.autowash.autowash_pro.dto.request.RedeemPointsRequest;
-import com.autowash.autowash_pro.dto.request.UpdateTierConfigRequest;
-import com.autowash.autowash_pro.dto.response.*;
+import com.autowash.autowash_pro.dto.request.loyalty.EarnPointsRequest;
+import com.autowash.autowash_pro.dto.request.loyalty.RedeemPointsRequest;
+import com.autowash.autowash_pro.dto.request.loyalty.UpdateTierConfigRequest;
+import com.autowash.autowash_pro.dto.response.loyalty.*;
 import com.autowash.autowash_pro.entity.Customer;
 import com.autowash.autowash_pro.entity.CustomerPoints;
 import com.autowash.autowash_pro.entity.LoyaltyTierConfig;

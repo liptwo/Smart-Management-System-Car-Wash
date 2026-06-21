@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.autowash.autowash_pro.dto.request.auth.AuthResponse;
+import com.autowash.autowash_pro.dto.response.auth.AuthResponse;
 import com.autowash.autowash_pro.dto.request.auth.LoginRequest;
 import com.autowash.autowash_pro.dto.request.auth.RefreshTokenRequest;
 import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;
-import com.autowash.autowash_pro.dto.response.CustomerProfileResponse;
+import com.autowash.autowash_pro.dto.response.customer.CustomerProfileResponse;
 import com.autowash.autowash_pro.service.AuthService;
 import com.autowash.autowash_pro.service.CustomerService;
 
@@ -43,7 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Đăng nhập bằng phone + password")
+    @Operation(summary = "Đăng nhập bằng email hoặc phone + password")
     public ResponseEntity<AuthResponse> login(
             @RequestBody @Valid LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
@@ -67,7 +67,7 @@ public class AuthController {
     @PutMapping("/me")
     @Operation(summary = "Cập nhật thông tin tài khoản của người dùng hiện tại")
     public ResponseEntity<CustomerProfileResponse> updateMyProfile(
-            @RequestBody @Valid com.autowash.autowash_pro.dto.request.CustomerRequestDTO request,
+            @RequestBody @Valid com.autowash.autowash_pro.dto.request.customer.CustomerRequestDTO request,
             @AuthenticationPrincipal UserDetails userDetails) {
         String phone = userDetails.getUsername();
         return ResponseEntity.ok(customerService.updateMyProfile(phone, request));

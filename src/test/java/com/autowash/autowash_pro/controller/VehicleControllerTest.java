@@ -13,8 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
-import com.autowash.autowash_pro.dto.vehicle.VehicleRequest;
-import com.autowash.autowash_pro.dto.vehicle.VehicleResponse;
+import com.autowash.autowash_pro.dto.request.vehicle.VehicleRequest;
+import com.autowash.autowash_pro.dto.response.vehicle.VehicleResponse;
 import com.autowash.autowash_pro.service.VehicleService;
 
 @ExtendWith(MockitoExtension.class)

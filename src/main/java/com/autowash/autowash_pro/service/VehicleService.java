@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.autowash.autowash_pro.dto.vehicle.VehicleRequest;
-import com.autowash.autowash_pro.dto.vehicle.VehicleResponse;
+import com.autowash.autowash_pro.dto.request.vehicle.VehicleRequest;
+import com.autowash.autowash_pro.dto.response.vehicle.VehicleResponse;
 import com.autowash.autowash_pro.entity.Customer;
 import com.autowash.autowash_pro.entity.Vehicle;
 import com.autowash.autowash_pro.exception.BusinessException;

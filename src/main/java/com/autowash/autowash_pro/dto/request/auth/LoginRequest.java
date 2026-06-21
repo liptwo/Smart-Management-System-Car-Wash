@@ -1,5 +1,6 @@
 package com.autowash.autowash_pro.dto.request.auth;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,8 +12,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LoginRequest {
 
-    @NotBlank(message = "Số điện thoại không được để trống")
-    private String phone;
+    @JsonAlias({"phone", "emailOrPhone", "username"})
+    @NotBlank(message = "Email hoặc số điện thoại không được để trống")
+    private String emailOrPhone;
 
     @NotBlank(message = "Mật khẩu không được để trống")
     private String password;

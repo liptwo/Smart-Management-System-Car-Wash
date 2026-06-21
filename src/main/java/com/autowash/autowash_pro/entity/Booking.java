@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.autowash.autowash_pro.enums.BookingStatus;
 import com.autowash.autowash_pro.enums.ServiceType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -33,6 +34,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// 🌟 ĐÃ THÊM: Ngăn chặn lỗi nổ Proxy kĩ thuật khi Jackson bốc dữ liệu Booking tuần tự trả về UI công khai
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Booking {
 
     @Id
@@ -42,10 +45,12 @@ public class Booking {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnoreProperties({"bookings", "vehicles", "points"}) // Tránh lặp vô hạn vòng lặp quan hệ chéo
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = false)
+    @JsonIgnoreProperties("customer")
     private Vehicle vehicle;
 
     @Column(name = "scheduled_at", nullable = false)
@@ -74,5 +79,6 @@ public class Booking {
     @OneToOne(mappedBy = "booking",
               cascade = CascadeType.ALL,
               fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("booking")
     private WashHistory washHistory;
 }
