@@ -1,11 +1,12 @@
-package com.autowash.autowash_pro.dto;
+package com.autowash.autowash_pro.dto.response.dashboard;
 
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -18,11 +19,10 @@ public class DashboardStatsDTO {
     private long carCount;
     private long newCustomerCount;
     private long issuedPoints;
-    
-    // Đồng bộ với các class phụ trợ xịn của DashboardService
+
     private List<RevenueChartData> revenue7Days;
     private List<QueueDataDTO> todayQueue;
-    
+
     private long memberCount;
     private long silverCount;
     private long goldCount;

@@ -8,15 +8,13 @@ import com.autowash.autowash_pro.entity.Article;
 import com.autowash.autowash_pro.enums.ArticleStatus;
 import com.autowash.autowash_pro.repository.ArticleRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
-
-    // Constructor Injection chuẩn chỉnh hệ thống
-    public ArticleService(ArticleRepository articleRepository) {
-        this.articleRepository = articleRepository;
-    }
 
     // 1. LUỒNG LẤY DANH SÁCH: Kết hợp thông minh giữa gõ ô Tìm kiếm và bộ lọc Tab Trạng thái
     public List<Article> getAdminArticles(String statusStr, String keyword) {

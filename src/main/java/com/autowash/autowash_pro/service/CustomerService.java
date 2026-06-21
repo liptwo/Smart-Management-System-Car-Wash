@@ -1,7 +1,7 @@
 package com.autowash.autowash_pro.service;
 
-import com.autowash.autowash_pro.dto.request.CustomerRequestDTO;
-import com.autowash.autowash_pro.dto.response.CustomerProfileResponse;
+import com.autowash.autowash_pro.dto.request.customer.CustomerRequestDTO;
+import com.autowash.autowash_pro.dto.response.customer.CustomerProfileResponse;
 import com.autowash.autowash_pro.entity.Customer;
 import com.autowash.autowash_pro.enums.Tier;
 import com.autowash.autowash_pro.exception.BusinessException;
@@ -18,17 +18,15 @@ import com.autowash.autowash_pro.repository.VehicleRepository;
 import com.autowash.autowash_pro.entity.Booking;
 import com.autowash.autowash_pro.repository.BookingRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CustomerService {
 
-    @Autowired
-    private CustomerRepository customerRepository;
-
-    @Autowired
-    private BookingRepository bookingRepository;
-
-    @Autowired
-    private VehicleRepository vehicleRepository;
+    private final CustomerRepository customerRepository;
+    private final BookingRepository bookingRepository;
+    private final VehicleRepository vehicleRepository;
 
     // 🌟 THAY THẾ & NÂNG CẤP HÀM NÀY: Lấy danh sách khách hàng kết hợp bộ lọc Tìm kiếm và Phân hạng Tier
     public List<Customer> getAdminCustomers(String keyword, String tierStr) {

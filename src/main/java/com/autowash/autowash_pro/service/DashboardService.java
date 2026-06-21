@@ -9,24 +9,21 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import com.autowash.autowash_pro.dto.DashboardStatsDTO;
-import com.autowash.autowash_pro.dto.QueueDataDTO;
-import com.autowash.autowash_pro.dto.RevenueChartData;
+import com.autowash.autowash_pro.dto.response.dashboard.DashboardStatsDTO;
+import com.autowash.autowash_pro.dto.response.dashboard.QueueDataDTO;
+import com.autowash.autowash_pro.dto.response.dashboard.RevenueChartData;
 import com.autowash.autowash_pro.entity.Booking;
 import com.autowash.autowash_pro.repository.BookingRepository;
 import com.autowash.autowash_pro.repository.CustomerRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class DashboardService {
 
     private final BookingRepository bookingRepository;
     private final CustomerRepository customerRepository;
-
-    // Inject thêm CustomerRepository để bốc dữ liệu khách hàng thực tế
-    public DashboardService(BookingRepository bookingRepository, CustomerRepository customerRepository) {
-        this.bookingRepository = bookingRepository;
-        this.customerRepository = customerRepository;
-    }
 
     public DashboardStatsDTO getDashboardStats() {
         List<RevenueChartData> revenue7Days = new ArrayList<>();

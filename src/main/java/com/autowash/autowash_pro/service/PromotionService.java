@@ -5,18 +5,16 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.autowash.autowash_pro.entity.Promotion;
-import com.autowash.autowash_pro.dto.request.PromotionRequest; 
+import com.autowash.autowash_pro.dto.request.promotion.PromotionRequest; 
 import com.autowash.autowash_pro.repository.PromotionRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class PromotionService {
 
     private final PromotionRepository promotionRepository;
-
-    // Giữ nguyên Constructor Injection chuẩn chỉnh của bạn
-    public PromotionService(PromotionRepository promotionRepository) {
-        this.promotionRepository = promotionRepository;
-    }
 
     // 1. 🌟 HÀM ĐÃ NÂNG CẤP: Lấy danh sách kết hợp bộ lọc Tab và Tìm kiếm từ khóa thông minh
     public List<Promotion> getPromotionsByStatus(String status, String keyword) {

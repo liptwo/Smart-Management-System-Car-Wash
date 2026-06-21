@@ -1,37 +1,28 @@
 package com.autowash.autowash_pro.controller;
 
-import com.autowash.autowash_pro.dto.DashboardStatsDTO;
-import com.autowash.autowash_pro.service.DashboardService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.autowash.autowash_pro.dto.response.dashboard.DashboardStatsDTO;
+import com.autowash.autowash_pro.service.DashboardService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/admin/dashboard")
-@RequiredArgsConstructor 
-// 🌟 ĐÃ NÂNG CẤP CORS: Cho phép đầy đủ các phương thức GET, POST, OPTIONS và truyền nhận Header bảo mật Authorization công khai
-@CrossOrigin(
-    origins = "http://localhost:5173", 
-    allowedHeaders = "*", 
-    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS},
-    allowCredentials = "true"
-)
+@RequiredArgsConstructor
+@Tag(name = "Dashboard", description = "Quản lý Dashboard và thống kê")
 public class DashboardController {
 
     private final DashboardService dashboardService;
 
     @GetMapping("/stats")
-    public ResponseEntity<?> getDashboardStats() {
-        try {
-            // Gọi hàm tính toán dữ liệu thực tế dynamic từ database của bạn
-            DashboardStatsDTO stats = dashboardService.getDashboardStats();
-            return ResponseEntity.ok(stats);
-        } catch (Exception e) {
-            System.err.println("=== CRASH HỆ THỐNG TẠI CONTROLLER DASHBOARD ===");
-            e.printStackTrace();
-            
-            // Nếu có lỗi kĩ thuật ngầm, trả về một Object rỗng mới để bảo vệ Frontend không bị sập giao diện
-            return ResponseEntity.ok(new DashboardStatsDTO());
-        }
+    @Operation(summary = "Lấy dữ liệu thống kê Dashboard")
+    public ResponseEntity<DashboardStatsDTO> getDashboardStats() {
+        return ResponseEntity.ok(dashboardService.getDashboardStats());
     }
 }

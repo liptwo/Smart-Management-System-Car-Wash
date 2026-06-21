@@ -1,4 +1,4 @@
-package com.autowash.autowash_pro.dto.request.auth;
+package com.autowash.autowash_pro.dto.response.auth;
 
 import com.autowash.autowash_pro.enums.Tier;
 import lombok.*;

@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.autowash.autowash_pro.config.JwtUtil;
-import com.autowash.autowash_pro.dto.request.auth.AuthResponse;
+import com.autowash.autowash_pro.dto.response.auth.AuthResponse;
 import com.autowash.autowash_pro.dto.request.auth.LoginRequest;
 import com.autowash.autowash_pro.dto.request.auth.RefreshTokenRequest;
 import com.autowash.autowash_pro.dto.request.auth.RegisterRequest;

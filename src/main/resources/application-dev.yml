@@ -35,3 +35,5 @@ logging:
     org.flywaydb: INFO
 
 #  d6d0faa6-f06b-4935-99ab-78117de3f75a
+cors:
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173}

@@ -1,4 +1,4 @@
-package com.autowash.autowash_pro.dto;
+package com.autowash.autowash_pro.dto.response.dashboard;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -276,8 +276,8 @@ public BookingResponse updateStatus(
                     amountPaid = new BigDecimal("50000");
                 }
 
-                com.autowash.autowash_pro.dto.request.EarnPointsRequest earnRequest = 
-                    new com.autowash.autowash_pro.dto.request.EarnPointsRequest();
+                com.autowash.autowash_pro.dto.request.loyalty.EarnPointsRequest earnRequest = 
+                    new com.autowash.autowash_pro.dto.request.loyalty.EarnPointsRequest();
                 earnRequest.setCustomerId(savedBooking.getCustomer().getCustomerId());
                 earnRequest.setWashId(savedBooking.getBookingId());
                 earnRequest.setAmountPaid(amountPaid);
