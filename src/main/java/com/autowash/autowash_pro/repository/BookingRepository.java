@@ -12,10 +12,8 @@ import com.autowash.autowash_pro.entity.Booking;
 import com.autowash.autowash_pro.enums.BookingStatus;
 
 @Repository
-public interface BookingRepository
-        extends JpaRepository<Booking, UUID> {
+public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
-    // 🌟 BỔ SUNG "washHistory" VÀO TẤT CẢ CÁC KHU VỰC ENTITYGRAPH ĐỂ TRIỆT TIÊU N+1 LỊCH SỬ
     @EntityGraph(attributePaths = {"customer", "vehicle", "washHistory"})
     List<Booking> findByCustomer_CustomerId(UUID customerId);
 
@@ -29,23 +27,17 @@ public interface BookingRepository
     List<Booking> findByStatusOrderByScheduledAtAsc(BookingStatus status);
 
     @EntityGraph(attributePaths = {"customer", "vehicle", "washHistory"})
-    List<Booking> findByCustomer_CustomerIdAndStatus(
-        UUID customerId, BookingStatus status);
+    List<Booking> findByCustomer_CustomerIdAndStatus(UUID customerId, BookingStatus status);
 
-    int countByCustomer_CustomerIdAndStatus(
-        UUID customerId, BookingStatus status);
+    int countByCustomer_CustomerIdAndStatus(UUID customerId, BookingStatus status);
 
-    // 🌟 ĐẶC BIỆT LÀ 2 HÀM LỌC LỊCH HẸN ADMIN NÀY:
-    @EntityGraph(attributePaths = {"customer", "vehicle", "washHistory"})
-    List<Booking> findByScheduledAtBetween(
-        LocalDateTime from, LocalDateTime to);
+        @EntityGraph(attributePaths = {"customer", "vehicle"})
+    List<Booking> findByScheduledAtBetween(LocalDateTime from, LocalDateTime to);
 
-    @EntityGraph(attributePaths = {"customer", "vehicle", "washHistory"})
-    List<Booking> findByScheduledAtBetweenOrderByPriorityScoreDescCreatedAtAsc(
-        LocalDateTime from, LocalDateTime to);
+    @EntityGraph(attributePaths = {"customer", "vehicle"})
+    List<Booking> findByScheduledAtBetweenOrderByPriorityScoreDescCreatedAtAsc(LocalDateTime from, LocalDateTime to);
 
-    int countByScheduledAtAndStatusIn(
-        LocalDateTime scheduledAt, List<BookingStatus> statuses);
+    int countByScheduledAtAndStatusIn(LocalDateTime scheduledAt, List<BookingStatus> statuses);
 
     boolean existsByVehicle_VehicleId(UUID vehicleId);
 }

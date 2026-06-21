@@ -1,7 +1,6 @@
 package com.autowash.autowash_pro.config;
 
 import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,33 +28,36 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+            // 🌟 KÍCH HOẠT: Cấu hình bắt tay CORS hàng đầu hệ thống
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
       
             .authorizeHttpRequests(auth -> auth
-        
-                .requestMatchers(HttpMethod.PATCH, "/api/admin/promotions/**").permitAll()
-                .requestMatchers(HttpMethod.PATCH, "/api/admin/**").permitAll()
+                // Thả tự do hoàn toàn cho mọi request OPTIONS kiểm tra của Chrome
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 
-                // Mở cửa cho các phương thức GET và POST của promotions
-                .requestMatchers(HttpMethod.GET, "/api/admin/promotions/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/admin/promotions/**").permitAll()
+                // Mở cửa tự do hoàn toàn cho Dashboard endpoints công cộng
+                .requestMatchers("/api/admin/dashboard/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
 
-                // THÊM: Mở cửa thông suốt tự do cho các phương thức của quản lý bài viết (Articles)
+                // Mở tự do luồng quản lý bài viết (Articles)
                 .requestMatchers(HttpMethod.GET, "/api/admin/articles/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/admin/articles/**").permitAll()
                 .requestMatchers(HttpMethod.PATCH, "/api/admin/articles/**").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/admin/articles/**").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/admin/articles/**").permitAll()
 
-                // Whitelist các đường dẫn mở tự do (Không cần Token)
+                // Mở tự do luồng Promotions
+                .requestMatchers(HttpMethod.PATCH, "/api/admin/promotions/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/admin/promotions/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/admin/promotions/**").permitAll()
+
+                // Whitelist các đường dẫn mở tự do không cần Token
                 .requestMatchers(
-                    "/api/auth/**",
                     "/actuator/health",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
@@ -65,42 +67,47 @@ public class SecurityConfig {
                     "/api/bookings/**"
                 ).permitAll()
                 
-                // Các đường dẫn Admin tổng quát còn lại công chứng quyền ADMIN
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/admin/**").permitAll()
                 
                 // Phân quyền khách hàng và admin dùng chung
                 .requestMatchers(
                     "/api/customers/**",
-                    "/api/bookings/**",
                     "/api/loyalty/**",
                     "/api/vehicles/**"
                 ).hasAnyRole("CUSTOMER", "ADMIN")
                 
+                // Các đường dẫn Admin còn lại bắt buộc quyền ADMIN
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                
                 .anyRequest().authenticated()
             )
             .userDetailsService(userDetailsService)
-            .addFilterBefore(jwtAuthFilter,
-                UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    // 🌟 ĐÃ CẬP NHẬT: Cấu hình CORS cao cấp xử lý dứt điểm Preflight cho Chrome DevTools
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Cấu hình danh sách tên miền Frontend được phép kết nối an toàn
-        config.setAllowedOriginPatterns(List.of(
+        // Chấp nhận mọi nguồn Frontend gọi tới một cách tường minh
+        config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "http://127.0.0.1:5173"));
-        config.setAllowedMethods(List.of(
-                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        
+        // 🌟 FIX TRIỆT ĐỂ: Mở bung toàn bộ Headers, cho phép cả Authorization viết hoa/thường đi qua
         config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization", "Link", "X-Total-Count"));
         config.setAllowCredentials(true);
+        config.setMaxAge(3600L); // Cache cấu hình CORS trong 1 tiếng để không bị lặp lại request Preflight
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 
@@ -110,8 +117,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }
