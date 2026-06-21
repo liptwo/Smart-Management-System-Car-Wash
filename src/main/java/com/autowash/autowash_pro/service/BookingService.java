@@ -51,6 +51,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final CustomerRepository customerRepository;
     private final VehicleRepository vehicleRepository;
+    private final NotificationService notificationService;
 
     public BookingResponse createBooking(
             CreateBookingRequest request,
@@ -167,7 +168,9 @@ public class BookingService {
         }
 
         booking.setStatus(BookingStatus.CANCELLED);
-        return mapToResponse(bookingRepository.save(booking));
+        Booking savedBooking = bookingRepository.save(booking);
+        notificationService.sendBookingStatusChanged(savedBooking);
+        return mapToResponse(savedBooking);
     }
 
     public BookingResponse updateStatus(
@@ -177,7 +180,9 @@ public class BookingService {
         Booking booking = findBooking(bookingId);
         validateStatusTransition(booking.getStatus(), newStatus);
         booking.setStatus(newStatus);
-        return mapToResponse(bookingRepository.save(booking));
+        Booking savedBooking = bookingRepository.save(booking);
+        notificationService.sendBookingStatusChanged(savedBooking);
+        return mapToResponse(savedBooking);
     }
 
     private AvailabilitySlotResponse buildAvailabilitySlot(

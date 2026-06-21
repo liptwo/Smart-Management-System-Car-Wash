@@ -38,6 +38,7 @@ public class LoyaltyService {
     private final CustomerRepository customerRepository;
     private final CustomerPointsRepository customerPointsRepository;
     private final LoyaltyTierConfigRepository loyaltyTierConfigRepository;
+    private final NotificationService notificationService;
 
     // =========================================================================
     // Admin: Xem cấu hình điểm thưởng
@@ -136,9 +137,14 @@ public class LoyaltyService {
 
         customerPointsRepository.save(pointLog);
 
-        // Kiểm tra và nâng tier nếu đủ điều kiện
+        Tier oldTier = customer.getTier();
         checkAndUpgradeTier(customer);
         customerRepository.save(customer);
+
+        notificationService.sendPointsEarned(customer, points, customer.getTotalPoints());
+        if (customer.getTier() != oldTier) {
+            notificationService.sendTierChanged(customer, oldTier, customer.getTier());
+        }
 
         log.info("Khách {} tích được {} điểm | amountPaid={} | tier={}",
             customer.getCustomerId(), points, request.getAmountPaid(), customer.getTier());
@@ -263,7 +269,10 @@ public class LoyaltyService {
             Tier oldTier = customer.getTier();
             checkAndUpgradeTier(customer);
             customerRepository.save(customer);
-            if (customer.getTier().ordinal() > oldTier.ordinal()) upgraded++;
+            if (customer.getTier() != oldTier) {
+                upgraded++;
+                notificationService.sendTierChanged(customer, oldTier, customer.getTier());
+            }
         }
 
         log.info("[TierReview] Kết thúc: {} khách được nâng tier", upgraded);
