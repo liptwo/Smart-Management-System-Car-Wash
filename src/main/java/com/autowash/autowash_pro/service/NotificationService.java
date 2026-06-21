@@ -82,6 +82,17 @@ public class NotificationService {
                 .build());
     }
 
+    public void sendPromotionNew(UUID customerId, String title, String message) {
+        sendToCustomer(
+            customerId,
+            NotificationEvent.builder()
+                .type(NotificationType.PROMO_NEW)
+                .title(title)
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build());
+    }
+
     public void sendToCustomer(UUID customerId, NotificationEvent event) {
         messagingTemplate.convertAndSend(
             "/topic/customer/" + customerId + "/notifications",

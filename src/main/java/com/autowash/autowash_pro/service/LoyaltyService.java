@@ -138,7 +138,7 @@ public class LoyaltyService {
         customerPointsRepository.save(pointLog);
 
         Tier oldTier = customer.getTier();
-        checkAndUpgradeTier(customer);
+        checkAndUpdateTier(customer);
         customerRepository.save(customer);
 
         notificationService.sendPointsEarned(customer, points, customer.getTotalPoints());
@@ -267,7 +267,7 @@ public class LoyaltyService {
 
         for (Customer customer : customers) {
             Tier oldTier = customer.getTier();
-            checkAndUpgradeTier(customer);
+            checkAndUpdateTier(customer);
             customerRepository.save(customer);
             if (customer.getTier() != oldTier) {
                 upgraded++;
@@ -416,15 +416,15 @@ public class LoyaltyService {
      * nhưng cần thêm query từ WashHistory (Dev 3 quản lý).
      * TODO: [Dev-4] Đổi sang dùng countVisitsInLast12Months() khi Dev 3 sẵn sàng.
      */
-    private void checkAndUpgradeTier(Customer customer) {
+    private void checkAndUpdateTier(Customer customer) {
         int visits = customer.getTotalVisits();
         Tier newTier = visits >= 50 ? Tier.PLATINUM
                      : visits >= 25 ? Tier.GOLD
                      : visits >= 10 ? Tier.SILVER
                                     : Tier.MEMBER;
 
-        if (newTier.ordinal() > customer.getTier().ordinal()) {
-            log.info("Khách {} được nâng tier {} → {}",
+        if (newTier != customer.getTier()) {
+            log.info("Khách {} đổi tier {} → {}",
                 customer.getCustomerId(), customer.getTier(), newTier);
             customer.setTier(newTier);
         }
