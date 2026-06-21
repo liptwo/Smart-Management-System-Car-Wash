@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,6 +59,28 @@ public class ArticleController {
             return ResponseEntity.ok(updatedArticle);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Lỗi khi đổi trạng thái bài viết: " + e.getMessage());
+        }
+    }
+
+    // 4. API CẬP NHẬT/CHỈNH SỬA TOÀN BỘ BÀI VIẾT (PUT)
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateArticle(@PathVariable UUID id, @RequestBody Article articleDetails) {
+        try {
+            Article updatedArticle = articleService.updateArticle(id, articleDetails);
+            return ResponseEntity.ok(updatedArticle);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Lỗi khi cập nhật bài viết: " + e.getMessage());
+        }
+    }
+
+    // 5. API XÓA VĨNH VIỄN BÀI VIẾT (DELETE)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteArticle(@PathVariable UUID id) {
+        try {
+            articleService.deleteArticleById(id);
+            return ResponseEntity.ok("Xóa bài viết vĩnh viễn thành công!");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Lỗi khi xóa bài viết: " + e.getMessage());
         }
     }
 }

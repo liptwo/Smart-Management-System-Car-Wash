@@ -50,6 +50,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/admin/articles/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/admin/articles/**").permitAll()
                 .requestMatchers(HttpMethod.PATCH, "/api/admin/articles/**").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/admin/articles/**").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/admin/articles/**").permitAll()
 
                 // Whitelist các đường dẫn mở tự do (Không cần Token)
                 .requestMatchers(

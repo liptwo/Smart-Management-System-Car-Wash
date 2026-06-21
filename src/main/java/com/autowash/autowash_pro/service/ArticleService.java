@@ -74,4 +74,37 @@ public class ArticleService {
 
         return articleRepository.save(article);
     }
+
+    // 4. LUỒNG CẬP NHẬT/CHỈNH SỬA CHI TIẾT BÀI VIẾT
+    @Transactional
+    public Article updateArticle(UUID id, Article details) {
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bài viết với ID: " + id));
+        
+        // Cập nhật từng trường dữ liệu động từ Frontend gửi sang
+        article.setTitle(details.getTitle());
+        article.setSummary(details.getSummary());
+        article.setContent(details.getContent());
+        article.setCoverImage(details.getCoverImage());
+        article.setCategory(details.getCategory());
+        article.setStatus(details.getStatus());
+        article.setAuthor(details.getAuthor());
+        
+        // Tái tạo lại slug theo tiêu đề mới để tối ưu SEO URL nếu tiêu đề thay đổi
+        String newSlug = details.getTitle().toLowerCase()
+                .replaceAll("[^a-z0-9\\s]", "")
+                .replaceAll("\\s+", "-");
+        article.setSlug(newSlug + "-" + System.currentTimeMillis() % 10000);
+
+        return articleRepository.save(article);
+    }
+
+    // 5. LUỒNG XÓA BÀI VIẾT KHỎI DATABASE
+    @Transactional
+    public void deleteArticleById(UUID id) {
+        if (!articleRepository.existsById(id)) {
+            throw new RuntimeException("Không thể xóa! Không tìm thấy bài viết với ID: " + id);
+        }
+        articleRepository.deleteById(id);
+    }
 }
