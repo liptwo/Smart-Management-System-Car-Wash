@@ -7,35 +7,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.autowash.autowash_pro.service.CustomerService;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 public class CustomerControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
+    @Mock
     private CustomerService customerService;
 
-    // Cấu hình MockBean theo phong cách Spring Boot mới độc lập
-    @TestConfiguration
-    static class CustomerControllerTestConfig {
-        @Bean
-        public CustomerService customerService() {
-            return Mockito.mock(CustomerService.class);
-        }
+    @InjectMocks
+    private CustomerController customerController;
+
+    @BeforeEach
+    public void setup() {
+        mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
     }
 
     // Test Case 1: GET All Customers
