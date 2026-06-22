@@ -27,4 +27,6 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
            "WHERE LOWER(c.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
            "OR c.phone LIKE CONCAT('%', :keyword, '%')")
     List<Customer> searchCustomers(@Param("keyword") String keyword);
+
+    List<Customer> findByRegisteredAtBetween(java.time.LocalDateTime start, java.time.LocalDateTime end);
 }
