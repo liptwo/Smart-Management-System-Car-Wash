@@ -3,17 +3,22 @@ package com.autowash.autowash_pro.service;
 import com.autowash.autowash_pro.dto.request.CustomerRequestDTO;
 import com.autowash.autowash_pro.dto.request.auth.ChangePasswordRequest;
 import com.autowash.autowash_pro.dto.response.CustomerProfileResponse;
+import com.autowash.autowash_pro.dto.response.PromotionResponse;
 import com.autowash.autowash_pro.entity.Customer;
+import com.autowash.autowash_pro.entity.Promotion;
 import com.autowash.autowash_pro.enums.Tier;
 import com.autowash.autowash_pro.exception.BusinessException;
 import com.autowash.autowash_pro.exception.ResourceNotFoundException;
 import com.autowash.autowash_pro.repository.CustomerRepository;
+import com.autowash.autowash_pro.repository.PromotionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import com.autowash.autowash_pro.entity.Vehicle;
 import com.autowash.autowash_pro.repository.VehicleRepository;
@@ -28,6 +33,9 @@ public class CustomerService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PromotionRepository promotionRepository;
 
     // Lấy toàn bộ danh sách khách hàng từ database đám mây Supabase
     public List<Customer> getAllCustomers() {
@@ -171,5 +179,31 @@ public class CustomerService {
 
         customer.setPassword(passwordEncoder.encode(request.getNewPassword()));
         customerRepository.save(customer);
+     }
+
+    @Transactional(readOnly = true)
+    public List<PromotionResponse> getPromotionsForCustomer(UUID customerId, String currentUserPhone) {
+        Customer currentUser = customerRepository.findByPhone(currentUserPhone)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài khoản"));
+
+        if (!currentUser.isAdmin() && !currentUser.getCustomerId().equals(customerId)) {
+            throw new BusinessException("Bạn không có quyền truy cập thông tin này");
+        }
+
+        Customer customer = getCustomerById(customerId);
+
+        return promotionRepository.findByIsActiveTrue().stream()
+                .filter(Promotion::isValid)
+                .filter(p -> p.getTargetTierList().contains(customer.getTier()))
+                .sorted(Comparator.comparing(Promotion::getEndsAt))
+                .map(p -> PromotionResponse.builder()
+                        .promoId(p.getPromoId())
+                        .name(p.getName())
+                        .description(p.getDescription())
+                        .promoType(p.getPromoType())
+                        .value(p.getValue())
+                        .endsAt(p.getEndsAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
