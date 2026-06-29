@@ -1,4 +1,4 @@
-package com.autowash.autowash_pro.dto.vehicle;
+package com.autowash.autowash_pro.dto.request.vehicle;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

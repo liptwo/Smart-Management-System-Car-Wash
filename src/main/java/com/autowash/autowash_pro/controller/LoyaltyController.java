@@ -1,8 +1,8 @@
 package com.autowash.autowash_pro.controller;
 
-import com.autowash.autowash_pro.dto.request.EarnPointsRequest;
-import com.autowash.autowash_pro.dto.request.RedeemPointsRequest;
-import com.autowash.autowash_pro.dto.response.*;
+import com.autowash.autowash_pro.dto.request.loyalty.EarnPointsRequest;
+import com.autowash.autowash_pro.dto.request.loyalty.RedeemPointsRequest;
+import com.autowash.autowash_pro.dto.response.loyalty.*;
 import com.autowash.autowash_pro.service.LoyaltyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/loyalty")
 @RequiredArgsConstructor
 @Tag(name = "Loyalty", description = "Quản lý điểm thưởng")
 public class LoyaltyController {
@@ -32,7 +31,7 @@ public class LoyaltyController {
     // POST /api/loyalty/earn — Tích điểm (Admin trigger sau khi booking DONE)
     // =========================================================================
 
-    @PostMapping("/earn")
+    @PostMapping("/api/loyalty/earn")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Tích điểm sau khi rửa xe xong")
     public ResponseEntity<EarnPointsResponse> earnPoints(
@@ -44,7 +43,7 @@ public class LoyaltyController {
     // POST /api/loyalty/redeem — Đổi điểm lấy thưởng
     // =========================================================================
 
-    @PostMapping("/redeem")
+    @PostMapping("/api/loyalty/redeem")
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @Operation(summary = "Đổi điểm lấy thưởng (DISCOUNT_10K / FREE_BASIC / FREE_PREMIUM / ADDON)")
     public ResponseEntity<RedeemPointsResponse> redeemPoints(
@@ -59,7 +58,7 @@ public class LoyaltyController {
     // GET /api/loyalty/balance/{customerId} — Xem số dư điểm (Client)
     // =========================================================================
 
-    @GetMapping("/balance/{customerId}")
+    @GetMapping("/api/loyalty/balance/{customerId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @Operation(summary = "Xem số dư điểm và điểm sắp hết hạn")
     public ResponseEntity<PointBalanceResponse> getBalance(
@@ -74,7 +73,7 @@ public class LoyaltyController {
     // POST /api/loyalty/tier-review — Trigger rà soát tier (Admin)
     // =========================================================================
 
-    @PostMapping("/tier-review")
+    @PostMapping("/api/loyalty/tier-review")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Trigger rà soát và cập nhật tier thủ công")
     public ResponseEntity<Map<String, String>> triggerTierReview() {

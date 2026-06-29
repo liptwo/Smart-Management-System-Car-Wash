@@ -30,4 +30,5 @@ public interface WashHistoryRepository
 
     boolean existsByCustomer_CustomerIdAndPromo_PromoTypeAndWashedAtAfter(
         UUID customerId, PromoType promoType, LocalDateTime washedAt);
+    List<WashHistory> findByWashedAtBetween(LocalDateTime start, LocalDateTime end);
 }

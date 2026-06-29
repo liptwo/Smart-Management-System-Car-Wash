@@ -1,4 +1,4 @@
-package com.autowash.autowash_pro.dto.response;
+package com.autowash.autowash_pro.dto.response.loyalty;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
