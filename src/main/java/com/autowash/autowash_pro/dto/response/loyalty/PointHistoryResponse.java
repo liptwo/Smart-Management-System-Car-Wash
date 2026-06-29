@@ -1,4 +1,4 @@
-package com.autowash.autowash_pro.dto.response;
+package com.autowash.autowash_pro.dto.response.loyalty;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

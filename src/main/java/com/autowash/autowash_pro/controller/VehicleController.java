@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.autowash.autowash_pro.dto.vehicle.VehicleRequest;
-import com.autowash.autowash_pro.dto.vehicle.VehicleResponse;
+import com.autowash.autowash_pro.dto.request.vehicle.VehicleRequest;
+import com.autowash.autowash_pro.dto.response.vehicle.VehicleResponse;
 import com.autowash.autowash_pro.service.VehicleService;
 
 import io.swagger.v3.oas.annotations.Operation;

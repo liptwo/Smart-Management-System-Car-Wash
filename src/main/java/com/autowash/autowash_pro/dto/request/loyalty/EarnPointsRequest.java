@@ -1,4 +1,4 @@
-package com.autowash.autowash_pro.dto.request;
+package com.autowash.autowash_pro.dto.request.loyalty;
 
 import java.math.BigDecimal;
 import java.util.UUID;

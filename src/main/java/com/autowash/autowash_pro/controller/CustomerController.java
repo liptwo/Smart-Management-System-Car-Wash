@@ -1,69 +1,84 @@
 package com.autowash.autowash_pro.controller;
 
-import com.autowash.autowash_pro.dto.request.CustomerRequestDTO;
+import com.autowash.autowash_pro.dto.request.customer.CustomerRequestDTO;
+import com.autowash.autowash_pro.dto.response.customer.CustomerProfileResponse;
+import com.autowash.autowash_pro.dto.response.vehicle.VehicleResponse;
+import com.autowash.autowash_pro.dto.response.booking.BookingResponse;
 import com.autowash.autowash_pro.entity.Customer;
 import com.autowash.autowash_pro.service.CustomerService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.UUID;
-import com.autowash.autowash_pro.entity.Vehicle;
-import com.autowash.autowash_pro.entity.Booking;
 
 @RestController
 @RequestMapping("/api/admin/customers")
-@CrossOrigin(origins = "http://localhost:5173") // Mở cổng cho React gọi sang
+@RequiredArgsConstructor
+@Tag(name = "Customer Admin", description = "Quản lý danh sách khách hàng dành cho Admin")
 public class CustomerController {
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerService customerService;
 
-    // Endpoint lấy danh sách khách hàng thật
     @GetMapping
-    public ResponseEntity<List<Customer>> getAllCustomers() {
-        return ResponseEntity.ok(customerService.getAllCustomers());
+    @Operation(summary = "Lấy danh sách khách hàng với bộ lọc tìm kiếm và hạng thành viên")
+    public ResponseEntity<List<CustomerProfileResponse>> getAdminCustomers(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String tier) {
+        List<CustomerProfileResponse> responses = customerService.getAdminCustomers(keyword, tier).stream()
+                .map(CustomerProfileResponse::from)
+                .toList();
+        return ResponseEntity.ok(responses);
     }
 
-    // Endpoint nhận dữ liệu từ Form popup dưới dạng JSON để lưu vào database
     @PostMapping
-    public ResponseEntity<?> addCustomer(@RequestBody CustomerRequestDTO request) {
-        try {
-            Customer createdCustomer = customerService.createCustomerAtCounter(request);
-            return ResponseEntity.ok(createdCustomer);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @Operation(summary = "Tạo mới khách hàng tại quầy")
+    public ResponseEntity<CustomerProfileResponse> addCustomer(@RequestBody CustomerRequestDTO request) {
+        Customer customer = customerService.createCustomerAtCounter(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CustomerProfileResponse.from(customer));
     }
 
-    // 1. Endpoint: GET http://localhost:8080/api/admin/customers/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable UUID id) {
-        return ResponseEntity.ok(customerService.getCustomerById(id));
+    @Operation(summary = "Lấy chi tiết khách hàng theo ID")
+    public ResponseEntity<CustomerProfileResponse> getCustomerById(@PathVariable UUID id) {
+        Customer customer = customerService.getCustomerById(id);
+        return ResponseEntity.ok(CustomerProfileResponse.from(customer));
     }
 
-    // 2. Endpoint: PUT http://localhost:8080/api/admin/customers/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable UUID id, @RequestBody CustomerRequestDTO dto) {
-        return ResponseEntity.ok(customerService.updateCustomer(id, dto));
+    @Operation(summary = "Cập nhật thông tin khách hàng")
+    public ResponseEntity<CustomerProfileResponse> updateCustomer(@PathVariable UUID id, @RequestBody CustomerRequestDTO dto) {
+        Customer customer = customerService.updateCustomer(id, dto);
+        return ResponseEntity.ok(CustomerProfileResponse.from(customer));
     }
 
-    // 3. Endpoint: DELETE http://localhost:8080/api/admin/customers/{id}
     @DeleteMapping("/{id}")
+    @Operation(summary = "Vô hiệu hóa khách hàng")
     public ResponseEntity<String> disableCustomer(@PathVariable UUID id) {
         customerService.disableCustomer(id);
         return ResponseEntity.ok("Đã vô hiệu hóa khách hàng thành công!");
     }
 
-    // Endpoint: GET http://localhost:8080/api/admin/customers/{id}/vehicles
     @GetMapping("/{id}/vehicles")
-    public ResponseEntity<List<Vehicle>> getVehiclesByCustomerId(@PathVariable UUID id) {
-        return ResponseEntity.ok(customerService.getVehiclesByCustomerId(id));
+    @Operation(summary = "Lấy danh sách xe của khách hàng")
+    public ResponseEntity<List<VehicleResponse>> getVehiclesByCustomerId(@PathVariable UUID id) {
+        List<VehicleResponse> responses = customerService.getVehiclesByCustomerId(id).stream()
+                .map(VehicleResponse::from)
+                .toList();
+        return ResponseEntity.ok(responses);
     }
 
-    // Endpoint: GET http://localhost:8080/api/admin/customers/{id}/history
     @GetMapping("/{id}/history")
-    public ResponseEntity<List<Booking>> getBookingHistoryByCustomerId(@PathVariable UUID id) {
-        return ResponseEntity.ok(customerService.getBookingHistoryByCustomerId(id));
+    @Operation(summary = "Lấy lịch sử đặt lịch của khách hàng")
+    public ResponseEntity<List<BookingResponse>> getBookingHistoryByCustomerId(@PathVariable UUID id) {
+        List<BookingResponse> responses = customerService.getBookingHistoryByCustomerId(id).stream()
+                .map(BookingResponse::from)
+                .toList();
+        return ResponseEntity.ok(responses);
     }
 }
