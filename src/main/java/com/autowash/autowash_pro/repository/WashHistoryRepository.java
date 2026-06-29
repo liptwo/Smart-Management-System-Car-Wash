@@ -24,4 +24,6 @@ public interface WashHistoryRepository
     int countVisitsSince(
         @Param("customerId") UUID customerId,
         @Param("since") LocalDateTime since);
+
+    List<WashHistory> findByWashedAtBetween(LocalDateTime start, LocalDateTime end);
 }
